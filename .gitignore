@@ -1,6 +1,7 @@
-data/players/*
-data/maps/*
-data/plugins/*
+worlds/*
+players/*
+plugins/*
+logs/*
 *.log
 server.properties
 white-list.txt
