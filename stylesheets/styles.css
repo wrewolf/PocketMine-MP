@@ -103,7 +103,7 @@ header {
 
 header ul {
   list-style:none;
-  height:40px;
+  height:50px;
   
   padding:0;
   
@@ -125,13 +125,37 @@ header li {
   width:89px;
   float:left;
   border-right:1px solid #d2d2d2;
-  height:40px;
+  height:50px;
+}
+
+header li.stable{
+  background: #C0FCD3;
+  background: -moz-linear-gradient(top, #C0FCD3 0%, #A7DBB7 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#C0FCD3), color-stop(100%,#A7DBB7));
+  background: -webkit-linear-gradient(top, #C0FCD3 0%,#A7DBB7 100%);
+  background: -o-linear-gradient(top, #C0FCD3 0%,#A7DBB7 100%);
+  background: -ms-linear-gradient(top, #C0FCD3 0%,#A7DBB7 100%);
+  background: linear-gradient(top, #C0FCD3 0%,#A7DBB7 100%);
+}
+
+header li.dev{
+  background: #FDFFCC;
+  background: -moz-linear-gradient(top, #FDFFCC 0%, #EFF294 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FDFFCC), color-stop(100%,#EFF294));
+  background: -webkit-linear-gradient(top, #FDFFCC 0%,#EFF294 100%);
+  background: -o-linear-gradient(top, #FDFFCC 0%,#EFF294 100%);
+  background: -ms-linear-gradient(top, #FDFFCC 0%,#EFF294 100%);
+  background: linear-gradient(top, #FDFFCC 0%,#EFF294 100%);
+}
+
+header li:hover{
+	background: #f9f9f9;
 }
 
 header ul a {
   line-height:1;
   font-size:11px;
-  color:#999;
+  color:#777;
   display:block;
   text-align:center;
   padding-top:6px;
