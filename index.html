@@ -62,8 +62,9 @@ It has a Plugin API that enables a developer to extend it and add new features, 
     <script src="javascripts/scale.fix.js"></script>
     <script type="text/javascript">
 		function setLatestCommit(response){
-			document.getElementById("latestDev").innerHTML = response.data[0].commit.tree.sha.substr(0,10);
-			document.getElementById("latestDevLink").href = "https://github.com/shoghicp/PocketMine-MP/archive/" + response.data[0].commit.tree.sha + ".zip";
+			sha = response.data[0].commit.url.substr(-40);
+			document.getElementById("latestDev").innerHTML = sha.substr(0,10);
+			document.getElementById("latestDevLink").href = "https://github.com/shoghicp/PocketMine-MP/archive/" + sha + ".zip";
 		}
 		function setLatestStable(response){
 			document.getElementById("latestStable").innerHTML = response.data[0].name;
