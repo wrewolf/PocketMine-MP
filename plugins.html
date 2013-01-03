@@ -14,43 +14,38 @@
     <![endif]-->
   </head>
   <body>
-<a href="https://github.com/shoghicp/PocketMine-MP/"><img onmouseover="this.src = 'https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png';" onmouseout="this.src = 'https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png';" style="position: fixed; top: 0; right: 0; border: 0;z-index:9999;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
- 
     <div class="wrapper">
 
       <header>
-        <h1>Plugins<br/>PocketMine-MP</h1>
+        <h1><a href="index.html" style="font-weight:bold;color:#000;"><img src="mini-icon.png"/> PocketMine-MP</a><br/>Plugins</h1>
         <p>Third-party Plugins for the PocketMine server</p>
 		<a href="https://twitter.com/PocketMine" class="twitter-follow-button" data-show-count="false">Follow @PocketMine</a>
 		<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-		</p>
         <ul class="installer">
-			<li style="width:270px;height:25px;border:0px;"><a href="https://github.com/shoghicp/PocketMine-MP"><img src="add-icon.png" class="list-icon"/><strong>Add a new Plugin</strong></a></li>
-			<li style="width:270px;height:25px;border:0px;border-radius:5px;border:1px solid #d2d2d2;box-shadow:inset #fff 0 1px 0, inset rgba(0,0,0,0.03) 0 -1px 0;margin-top:5px;"><a href="https://github.com/shoghicp/PocketMine-MP"><img src="github-icon.png" class="list-icon"/><strong>Browse Plugins on GitHub</strong></a></li>
+			<li style="width:270px;height:25px;border:0px;"><a href="https://docs.google.com/spreadsheet/viewform?formkey=dC1JQmVsRFVMX19xRE45aDl6amNBOHc6MQ&hl=en" target="_blank"><img src="add-icon.png" class="list-icon"/><strong>Submit a new Plugin</strong></a></li>
+			<li style="width:270px;height:25px;border:0px;border-radius:5px;border:1px solid #d2d2d2;box-shadow:inset #fff 0 1px 0, inset rgba(0,0,0,0.03) 0 -1px 0;margin-top:5px;"><a href="https://github.com/shoghicp/PocketMine-MP/tree/plugins"><img src="github-icon.png" class="list-icon"/><strong>Browse Plugins on GitHub</strong></a></li>
 			<li style="width:270px;height:25px;border:0px;border-radius:5px;border:1px solid #d2d2d2;box-shadow:inset #fff 0 1px 0, inset rgba(0,0,0,0.03) 0 -1px 0;margin-top:5px;"><a href="https://github.com/shoghicp/PocketMine-MP/wiki"><img src="docs-icon.png" class="list-icon"/><strong style="font-size:13px;">Wiki & Documentation</strong></a></li>
 			<li style="width:270px;height:25px;border:0px;border-radius:5px;border:1px solid #d2d2d2;box-shadow:inset #fff 0 1px 0, inset rgba(0,0,0,0.03) 0 -1px 0;margin-top:5px;"><a href="https://github.com/shoghicp/PocketMine-MP/issues"><img src="bug-icon.png" class="list-icon"/><strong style="font-size:13px;">Found a Bug? Want a new feature?</strong></a></li>
 		</ul>
       </header>
       <section>
-        <p><img src="logo.png" alt="PocketMine-MP Logo"/></p>
-
-<p>The entire server is done in PHP, and has been tested, profiled and optimized to run smoothly.</p>
-<p>Check the sidebar for the latest <a href="https://github.com/shoghicp/PocketMine-MP/tags">Stable</a> or <a href="https://github.com/shoghicp/PocketMine-MP/archive/master.zip">Development</a> release.</p>
-
-<h2><strong><a href="https://github.com/shoghicp/PocketMine-MP/wiki">Go to Wiki for more information</a></strong></h2>
-
-<h2><strong><a href="https://github.com/shoghicp/PocketMine-MP/wiki/Frequently-Asked-Questions">FAQ: Frequently Asked Questions</a></strong></h2>
-
-
-<h2>Current features of the server:</h2>
-
-<ul>
-<li>Full Creative mode!</li>
-<li>Plugin API</li>
-<li>Custom world generation</li>
-<li>Update Channels!! (stable / dev)</li>
-</ul>
-
+	  <h1>Popular Plugins</h1>
+	  <ul class="plugins">
+		<li><a href="p/World-Editor.html">
+		<div class="content">
+			<div class="name">World Editor <span class="version">0.2</span></div>
+			<div class="description">World Editor is a port of WorldEdit to PocketMine</div>
+			<div class="author">shoghicp</div>
+		</div>
+		</a></li>
+		<li><a href="p/Spawn-Changer.html">
+		<div class="content">
+			<div class="name">Spawn Changer <span class="version">0.0.1</span></div>
+			<div class="description">Change the spawn coordinates, or make it default for all players!</div>
+			<div class="author">shoghicp</div>
+		</div>
+		</a></li>
+	  </ul>
       </section>
       <!--<footer>
 	    <p>This project is maintained by <a href="https://github.com/shoghicp">shoghicp</a></p>
@@ -58,18 +53,5 @@
       </footer>-->
     </div>
     <script src="javascripts/scale.fix.js"></script>
-    <script type="text/javascript">
-		function setLatestCommit(response){
-			sha = response.data[0].commit.url.substr(-40);
-			document.getElementById("latestDev").innerHTML = sha.substr(0,10);
-			document.getElementById("latestDevLink").href = "https://github.com/shoghicp/PocketMine-MP/archive/" + sha + ".zip";
-		}
-		function setLatestStable(response){
-			document.getElementById("latestStable").innerHTML = response.data[0].name;
-			document.getElementById("latestStableLink").href = response.data[0].zipball_url;
-		}	
-	</script>
-	<script src="https://api.github.com/repos/shoghicp/PocketMine-MP/commits?callback=setLatestCommit"></script>
-	<script src="https://api.github.com/repos/shoghicp/PocketMine-MP/tags?callback=setLatestStable"></script>
   </body>
 </html>
