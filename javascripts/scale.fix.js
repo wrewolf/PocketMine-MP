@@ -15,3 +15,11 @@ function gestureStart() {
     }
   }
 }
+
+$(function(){
+	var date = new Date();
+	date = date.getTime();
+    $("a").each(function() {
+        $(this).attr("href", this.href + "?" + date);
+    });
+});
