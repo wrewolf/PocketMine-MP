@@ -178,7 +178,7 @@ ul.servers li div.ip{
 ul.plugins{
   list-style:none;
   padding:0px;  
-  width:400px;
+  width:100%;
 }
 ul.plugins li{
   background: #eee;
@@ -189,7 +189,7 @@ ul.plugins li{
   background: -ms-linear-gradient(top, #f8f8f8 0%,#dddddd 100%);
   background: linear-gradient(top, #f8f8f8 0%,#dddddd 100%);
   position: relative;
-  width:400px;
+  width:100%;
   float:left;
   padding:0px;  
   border-radius:5px;
