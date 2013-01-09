@@ -16,10 +16,21 @@ function gestureStart() {
   }
 }
 
+function strpos (haystack, needle, offset) {
+  var i = (haystack + '').indexOf(needle, (offset || 0));
+  return i === -1 ? false : i;
+}
+
 $(function(){
 	var date = new Date();
 	date = date.getTime();
     $("a").each(function() {
-        $(this).attr("href", this.href + "?" + date);
+		if(strpos(this.href, "mediafire.com") == false){
+			if(strpos(this.href, "?") != false){
+				$(this).attr("href", this.href + "&" + date);
+			}else{
+				$(this).attr("href", this.href + "?" + date);
+			}
+		}
     });
 });
