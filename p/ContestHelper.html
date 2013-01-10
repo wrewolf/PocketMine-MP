@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Kick - PocketMine-MP</title>
+    <title>ContestHelper - PocketMine-MP</title>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	<link rel="shortcut icon" href="../favicon.png" />
     <link rel="stylesheet" href="../stylesheets/styles.css">
@@ -18,19 +18,30 @@
 
       <header>
         <h1><a href="../plugins.html" style="font-weight:bold;color:#000;"><img src="../mini-icon.png"/> PocketMine-MP</a><br/><em style="font-weight:normal;">
-		Kick
+		ContestHelper
 		</em></h1>
-        <p>Adds the /kick command with the same syntax as Minecraft.</p>
-		<p><em style="font-size:16px;">By C0deH4cker</em></p>
+        <p>ContestHelper helps you hold Contest events</p>
+		<p><em style="font-size:16px;">By MinecrafterJPN</em></p>
 		<p><em style="font-size:16px;">Tested in Alpha_1.0.4</em></p>
         <ul class="installer">
-			<li style="width:270px;height:25px;border:0px;"><a href="https://github.com/shoghicp/PocketMine-MP/blob/plugins/latest/Kick_0.0.1.zip?raw=true"><strong>Download 0.0.1</strong></a></li>
+			<li style="width:270px;height:25px;border:0px;"><a href="https://github.com/shoghicp/PocketMine-MP/blob/plugins/latest/ContestHelper_0.1.zip?raw=true"><strong>Download 0.1</strong></a></li>
 			<li style="width:270px;height:25px;border:0px;border-radius:5px;border:1px solid #d2d2d2;box-shadow:inset #fff 0 1px 0, inset rgba(0,0,0,0.03) 0 -1px 0;margin-top:5px;"><a href="https://github.com/C0deH4cker/PocketMine-MP-Plugins/"><strong>Homepage</strong></a></li>
 		</ul>
       </header>
       <section>
-	  <p>Adds the /kick command with the same syntax as Minecraft.</p>
-	  <p>Usage: /kick &lt;playername&gt; [reason]</p>
+	  <p>ContestHelper helps you hold Contest events.</p>
+		<h3>Commands</h3>
+		<p><> is an essential param.<br/>
+		[] is an optional param.
+
+		<h4>setarea &lt;PlayerName&gt;</h4>
+		The command which set the present coordinates of &lt;PlayerName&gt; as his point area.<br/>
+		When someone place one block there, the player assigned the area gets one point.<br/>
+		When someone break one block there, the player assigned the area loses one point.<br/>
+
+		<h4>ranking [limit]</h4>
+		The command which display the ranking up to [limit] place.<br/>
+		default : [limit] = 3.</p>
       </section>
     </div>
     <script src="../javascripts/scale.fix.js"></script>
