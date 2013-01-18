@@ -5,7 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>PocketMine-MP - Minecraft PE server software with Plugins</title>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-	<script type="text/javascript" src="javascripts/github.min.js"></script>
 	<link rel="shortcut icon" href="favicon.png" />
     <link rel="stylesheet" href="stylesheets/styles.css?3">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
@@ -56,7 +55,7 @@
 			<li><a href="servers.html"><strong>Server List</strong></a></li>
 		</ul>
         <p><img src="logo.png" alt="PocketMine-MP Logo"/></p>
-<p><div class="github-widget" data-repo="shoghicp/PocketMine-MP"></div></p>
+<p><div class="github-widget" data-repo="shoghicp/PocketMine-MP"><strong>PocketMine-MP is a server software for Minecraft PE (Pocket Edition) done in PHP. It has a Plugin API that enables a developer to extend it and add new features, or change default ones</strong></div></p>
 <p>The entire server is done in PHP, and has been tested, profiled and optimized to run smoothly.</p>
 <p>Check the sidebar for the latest <a href="https://github.com/shoghicp/PocketMine-MP/tags">Stable</a> or <a href="https://github.com/shoghicp/PocketMine-MP/archive/master.zip">Development</a> release.</p>
 
@@ -81,10 +80,13 @@
 			document.getElementById("latestStableLink").href = response.data[0].zipball_url;
 		}	
 	</script>
-	<script src="https://api.github.com/repos/shoghicp/PocketMine-MP/commits?callback=setLatestCommit"></script>
-	<script src="https://api.github.com/repos/shoghicp/PocketMine-MP/tags?callback=setLatestStable"></script>
+	<script type="text/javascript" src="https://api.github.com/repos/shoghicp/PocketMine-MP/commits?callback=setLatestCommit"></script>
+	<script type="text/javascript" src="https://api.github.com/repos/shoghicp/PocketMine-MP/tags?callback=setLatestStable"></script>
 	<script type="text/javascript">
-
+	$(".github-widget").html("");	
+	</script>
+	<script type="text/javascript" src="javascripts/github.min.js"></script>
+	<script type="text/javascript">
 	  var _gaq = _gaq || [];
 	  _gaq.push(['_setAccount', 'UA-37722441-1']);
 	  _gaq.push(['_trackPageview']);
