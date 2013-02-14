@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__)."/src/dependencies.php");
+require_once(dirname(__FILE__)."/../src/dependencies.php");
 
 class BinaryRWTest extends PHPUnit_Framework_TestCase{
 	public function testRead(){
