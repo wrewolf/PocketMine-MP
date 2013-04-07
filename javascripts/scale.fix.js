@@ -34,4 +34,4 @@ $(function(){
 		}
     });
 });
-window.location = "http://www.pocketmine.org/";
+window.location = "http://www.pocketmine.net/";
