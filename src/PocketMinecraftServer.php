@@ -36,10 +36,7 @@ class PocketMinecraftServer{
 		if($this->version->isDev()){
 			console("[INFO] \x1b[31;1mThis is a Development version");
 		}
-		console("[INFO] Starting \x1b[36;1m".CURRENT_MINECRAFT_VERSION."\x1b[0m #".CURRENT_PROTOCOL." Minecraft PE Server at ".$this->serverip.":".$this->port);
-		if($this->port < 19132 or $this->port > 19135){ //Mojang =(
-			console("[WARNING] You've selected a not-standard port. Normal port range is from 19132 to 19135 included");
-		}
+		console("[INFO] Starting server for Minecraft: PE \x1b[36;1m".CURRENT_MINECRAFT_VERSION."\x1b[0m #".CURRENT_PROTOCOL." at ".$this->serverip.":".$this->port);
 		define("BOOTUP_RANDOM", Utils::getRandomBytes(16));
 		$this->serverID = $this->serverID === false ? Utils::readLong(Utils::getRandomBytes(8, false)):$this->serverID;
 		$this->seed = $this->seed === false ? Utils::readInt(Utils::getRandomBytes(4, false)):$this->seed;
@@ -77,7 +74,7 @@ class PocketMinecraftServer{
 	}
 
 	function __construct($name, $gamemode = SURVIVAL, $seed = false, $port = 19132, $serverip = "0.0.0.0"){
-		$this->port = (int) $port; //19132 - 19135
+		$this->port = (int) $port;
 		$this->doTick = true;
 		$this->gamemode = (int) $gamemode;
 		$this->name = $name;
@@ -555,12 +552,17 @@ class PocketMinecraftServer{
 	}
 
 	public function process(){
+		$lastLoop = 0;
 		while($this->stop === false){
 			$packet = $this->interface->readPacket();
 			if($packet !== false){
 				$this->packetHandler($packet);
+				$lastLoop = 0;
 			}else{
-				usleep(1);
+				++$lastLoop;
+				if($lastLoop >= 16){
+					usleep(5000);
+				}
 			}
 		}
 	}
@@ -618,7 +620,7 @@ class PocketMinecraftServer{
 					$return = call_user_func($schedule[0], $schedule[1], $schedule[2]);
 				}
 
-				if($action["repeat"] === 0 or $return === false){
+				if($action["repeat"] == 0 or $return === false){
 					$this->query("DELETE FROM actions WHERE ID = ".$action["ID"].";");
 					$this->schedule[$cid] = null;
 					unset($this->schedule[$cid]);

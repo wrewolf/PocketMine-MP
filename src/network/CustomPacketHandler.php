@@ -266,11 +266,11 @@ class CustomPacketHandler{
 				break;
 			case MC_REMOVE_PLAYER:
 				if($this->c === false){
-					$this->data["clientID"] = Utils::readLong($this->get(8));
 					$this->data["eid"] = Utils::readInt($this->get(4));
+					$this->data["clientID"] = Utils::readLong($this->get(8));
 				}else{
-					$this->raw .= Utils::writeLong($this->data["clientID"]);
 					$this->raw .= Utils::writeInt($this->data["eid"]);
+					$this->raw .= Utils::writeLong($this->data["clientID"]);
 				}
 				break;
 			case MC_ADD_ENTITY:
@@ -490,6 +490,21 @@ class CustomPacketHandler{
 					$this->raw .= Utils::writeShort($this->data["unknown3"]);
 					$this->raw .= Utils::writeShort($this->data["unknown4"]);
 					$this->raw .= Utils::writeInt($this->data["unknown5"]);
+				}
+				break;
+			case MC_TILE_EVENT:
+				if($this->c === false){
+					$this->data["x"] = Utils::readInt($this->get(4));
+					$this->data["y"] = Utils::readInt($this->get(4));
+					$this->data["z"] = Utils::readInt($this->get(4));
+					$this->data["case1"] = Utils::readInt($this->get(4));
+					$this->data["case2"] = Utils::readInt($this->get(4));
+				}else{
+					$this->raw .= Utils::writeInt($this->data["x"]);
+					$this->raw .= Utils::writeInt($this->data["y"]);
+					$this->raw .= Utils::writeInt($this->data["z"]);
+					$this->raw .= Utils::writeInt($this->data["case1"]);
+					$this->raw .= Utils::writeInt($this->data["case2"]);
 				}
 				break;
 			case MC_ENTITY_EVENT:

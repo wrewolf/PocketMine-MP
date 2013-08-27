@@ -385,6 +385,10 @@ class Entity extends Position{
 			$this->tickCounter = 0;
 		}
 		
+		if($this->closed === true){
+			return false;
+		}
+		
 		if($this->isStatic === false){
 			$startX = floor($this->x - 0.5 - $this->size - 1);
 			$y = (int) round($this->y - 1);
@@ -591,12 +595,12 @@ class Entity extends Position{
 		if(!($player instanceof Player)){
 			$player = $this->server->api->player->get($player);
 		}
-		if($player->eid === $this->eid or $this->closed !== false or $player->level !== $this->level){
+		if($player->eid === $this->eid or $this->closed !== false or ($player->level !== $this->level and $this->class !== ENTITY_PLAYER)){
 			return false;
 		}
 		switch($this->class){
 			case ENTITY_PLAYER:
-				if($this->player->connected !== true){
+				if($this->player->connected !== true or $this->player->spawned === false){
 					return false;
 				}
 				$player->dataPacket(MC_ADD_PLAYER, array(
@@ -924,16 +928,14 @@ class Entity extends Position{
 				$this->updateMetadata();
 				$this->dead = true;
 				if($this->player instanceof Player){
-					$x = $this->x;
-					$y = $this->y;
-					$z = $this->z;
-					$this->x = 0;
-					$this->y = -10;
-					$this->z = 0;
-					$this->server->api->trigger("entity.move", $this);
-					$this->x = $x;
-					$this->y = $y;
-					$this->z = $z;
+					$this->server->api->player->broadcastPacket($this->server->api->player->getAll($this->level), MC_MOVE_ENTITY_POSROT, array(
+						"eid" => $this->eid,
+						"x" => -256,
+						"y" => 128,
+						"z" => -256,
+						"yaw" => 0,
+						"pitch" => 0,
+					));
 				}else{
 					$this->server->api->dhandle("entity.event", array("entity" => $this, "event" => 3)); //Entity dead
 				}

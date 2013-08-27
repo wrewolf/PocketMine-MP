@@ -248,6 +248,9 @@ class Player{
 				}
 			}
 			$this->data->set("armor", $armor);
+			if($this->entity instanceof Entity){
+				$this->data->set("health", $this->entity->getHealth());
+			}
 			$this->data->set("gamemode", $this->gamemode);
 		}
 	}
@@ -269,17 +272,26 @@ class Player{
 			$this->level->freeAllChunks($this);
 			$this->spawned = false;
 			$this->loggedIn = false;
-			if($msg === true and $this->username != ""){
-				$this->server->api->chat->broadcast($this->username." left the game");
-			}
 			$this->buffer = null;
 			unset($this->buffer);
 			$this->recoveryQueue = array();
 			$this->receiveQueue = array();
 			$this->resendQueue = array();
+			$this->ackQueue = array();
 			$this->server->interface->stopChunked($this->CID);
 			$this->server->api->player->remove($this->CID);
+			if($msg === true and $this->username != ""){
+				$this->server->api->chat->broadcast($this->username." left the game");
+			}
 			console("[INFO] \x1b[33m".$this->username."\x1b[0m[/".$this->ip.":".$this->port."] logged out due to ".$reason);
+			$this->windows = array();
+			$this->armor = array();
+			$this->inventory = array();
+			$this->chunksLoaded = array();
+			$this->chunksOrder = array();
+			$this->chunkCount = array();
+			$this->cratingItems = array();
+			$this->received = array();
 		}
 	}
 	
@@ -509,14 +521,6 @@ class Player{
 					"speedZ" => (int) ($data->speedZ * 400),
 				));
 				break;
-			case "entity.remove":
-				if($data->eid === $this->eid or $data->level !== $this->level){
-					break;
-				}
-				$this->dataPacket(MC_REMOVE_ENTITY, array(
-					"eid" => $data->eid,
-				));
-				break;
 			case "entity.animate":
 				if($data["eid"] === $this->eid or $data["entity"]->level !== $this->level){
 					break;
@@ -722,18 +726,35 @@ class Player{
 					$this->entity->check = true;
 					return false;
 				}
+
 				foreach($this->server->api->entity->getAll($this->level) as $e){
 					if($e !== $this->entity){
 						if($e->player instanceof Player){
-							$e->player->dataPacket(MC_REMOVE_ENTITY, array(
-								"eid" => $this->eid,
+							$e->player->dataPacket(MC_MOVE_ENTITY_POSROT, array(
+								"eid" => $this->entity->eid,
+								"x" => -256,
+								"y" => 128,
+								"z" => -256,
+								"yaw" => 0,
+								"pitch" => 0,
+							));
+							$this->dataPacket(MC_MOVE_ENTITY_POSROT, array(
+								"eid" => $e->eid,
+								"x" => -256,
+								"y" => 128,
+								"z" => -256,
+								"yaw" => 0,
+								"pitch" => 0,
+							));
+						}else{
+							$this->dataPacket(MC_REMOVE_ENTITY, array(
+								"eid" => $e->eid,
 							));
 						}
-						$this->dataPacket(MC_REMOVE_ENTITY, array(
-							"eid" => $e->eid,
-						));
 					}
 				}
+				
+
 				$this->level->freeAllChunks($this);
 				$this->level = $pos->level;
 				$this->chunksLoaded = array();
@@ -743,7 +764,35 @@ class Player{
 					"time" => $this->level->getTime(),
 				));
 				$terrain = true;
+				
+				foreach($this->server->api->player->getAll($this->level) as $player){
+					if($player !== $this and $player->entity instanceof Entity){
+						$this->dataPacket(MC_MOVE_ENTITY_POSROT, array(
+							"eid" => $player->entity->eid,
+							"x" => $player->entity->x,
+							"y" => $player->entity->y,
+							"z" => $player->entity->z,
+							"yaw" => $player->entity->yaw,
+							"pitch" => $player->entity->pitch,
+						));
+						$player->dataPacket(MC_PLAYER_EQUIPMENT, array(
+							"eid" => $this->eid,
+							"block" => $this->getSlot($this->slot)->getID(),
+							"meta" => $this->getSlot($this->slot)->getMetadata(),
+							"slot" => 0,
+						));
+						$this->sendArmor($player);
+						$this->dataPacket(MC_PLAYER_EQUIPMENT, array(
+							"eid" => $player->eid,
+							"block" => $player->getSlot($player->slot)->getID(),
+							"meta" => $player->getSlot($player->slot)->getMetadata(),
+							"slot" => 0,
+						));
+						$player->sendArmor($this);
+					}
+				}
 			}
+
 			$this->lastCorrect = $pos;
 			$this->entity->fallY = false;
 			$this->entity->fallStart = false;
@@ -1153,7 +1202,6 @@ class Player{
 				$this->entity->setName($this->username);
 				$this->entity->data["CID"] = $this->CID;
 				$this->evid[] = $this->server->event("server.chat", array($this, "eventHandler"));
-				$this->evid[] = $this->server->event("entity.remove", array($this, "eventHandler"));
 				$this->evid[] = $this->server->event("entity.motion", array($this, "eventHandler"));
 				$this->evid[] = $this->server->event("entity.animate", array($this, "eventHandler"));
 				$this->evid[] = $this->server->event("entity.event", array($this, "eventHandler"));
@@ -1176,9 +1224,13 @@ class Player{
 						if($this->spawned !== false){
 							break;
 						}
+						$this->entity->setHealth($this->data->get("health"));
 						$this->spawned = true;	
+						$this->server->api->player->spawnAllPlayers($this);
+						$this->server->api->player->spawnToAllPlayers($this);
 						$this->server->api->entity->spawnAll($this);
 						$this->server->api->entity->spawnToAll($this->entity);
+						
 						$this->server->schedule(5, array($this->entity, "update"), array(), true);
 						$this->sendArmor();
 						$this->sendChat($this->server->motd."\n");
@@ -1223,6 +1275,7 @@ class Player{
 				if($this->spawned === false){
 					break;
 				}
+
 				$data["eid"] = $this->eid;
 				$data["player"] = $this;
 				
@@ -1379,15 +1432,20 @@ class Player{
 					}
 					$slot = $this->armor[$i];
 					if($slot->getID() !== AIR and $s->getID() === AIR){
-						$this->addItem($slot->getID(), $slot->getMetadata(), 1);
+						$this->addItem($slot->getID(), $slot->getMetadata(), 1, false);
 						$this->armor[$i] = BlockAPI::getItem(AIR, 0, 0);
+						$data["slot$i"] = 255;
 					}elseif($s->getID() !== AIR and $slot->getID() === AIR and ($sl = $this->hasItem($s->getID())) !== false){
 						$this->armor[$i] = $this->getSlot($sl);
 						$this->setSlot($sl, BlockAPI::getItem(AIR, 0, 0), false);
+					}elseif($s->getID() !== AIR and $slot->getID() !== AIR and ($slot->getID() !== $s->getID() or $slot->getMetadata() !== $s->getMetadata()) and ($sl = $this->hasItem($s->getID())) !== false){
+						$item = $this->armor[$i];
+						$this->armor[$i] = $this->getSlot($sl);
+						$this->setSlot($sl, $item, false);
 					}else{
 						$data["slot$i"] = 255;
 					}
-					
+
 				}		
 				$this->sendArmor();
 				if($this->entity->inAction === true){
@@ -1471,7 +1529,9 @@ class Player{
 						}
 						$target->harm($damage, $this->eid);
 						if($slot->isTool() === true and ($this->gamemode & 0x01) === 0){
-							$slot->useOn($target);
+							if($slot->useOn($target) and $slot->getMetadata() >= $slot->getMaxDurability()){
+								$this->setSlot($this->slot, new Item(AIR, 0, 0), false);
+							}
 						}
 					}
 				}
@@ -1532,7 +1592,7 @@ class Player{
 							RAW_CHICKEN => 2,
 							MELON_SLICE => 2,
 							GOLDEN_APPLE => 10,
-							COOKIE => 2,
+							//COOKIE => 2,
 							COOKED_FISH => 5,
 							RAW_FISH => 2,
 						);
@@ -1605,7 +1665,17 @@ class Player{
 				}
 				$this->craftingItems = array();
 				$this->toCraft = array();
+				if(isset($this->windows[$data["windowid"]]) and $this->windows[$data["windowid"]]->class === TILE_CHEST){
+					$this->server->api->player->broadcastPacket($this->server->api->player->getAll($this->level), MC_TILE_EVENT, array(
+						"x" => $this->windows[$data["windowid"]]->x,
+						"y" => $this->windows[$data["windowid"]]->y,
+						"z" => $this->windows[$data["windowid"]]->z,
+						"case1" => 1,
+						"case2" => 0,
+					));
+				}
 				unset($this->windows[$data["windowid"]]);
+
 				$this->dataPacket(MC_CONTAINER_CLOSE, array(
 					"windowid" => $data["windowid"],
 				));
@@ -1614,7 +1684,7 @@ class Player{
 				if($this->spawned === false or $this->blocked === true){
 					break;
 				}
-				
+
 				if($this->lastCraft <= (microtime(true) - 1)){
 					if(isset($this->toCraft[-1])){
 						$this->toCraft = array(-1 => $this->toCraft[-1]);
@@ -1638,7 +1708,7 @@ class Player{
 						}
 						$this->toCraft[$data["slot"]] = $craftItem;
 						$craft = true;
-					}elseif(((count($this->toCraft) === 1 and isset($this->toCraft[-1])) or count($this->toCraft) === 0) and $slot->count > 0 and $slot->getID() !== AIR and ($slot->getID() !== $data["block"] or $slot->getMetadata() !== $data["meta"])){ //Crafting final
+					}elseif(((count($this->toCraft) === 1 and isset($this->toCraft[-1])) or count($this->toCraft) === 0) and $slot->count > 0 and $slot->getID() > AIR and ($slot->getID() !== $data["block"] or $slot->getMetadata() !== $data["meta"])){ //Crafting final
 						$craftItem = BlockAPI::getItem($data["block"], $data["meta"], $data["stack"]);
 						if(count($this->toCraft) === 0){
 							$this->toCraft[-1] = 0;
@@ -1648,7 +1718,6 @@ class Player{
 						$this->toCraft[$data["slot"]] = $craftItem;
 						$craft = true;
 					}
-					
 			
 					if($craft === true){
 						$this->lastCraft = microtime(true);

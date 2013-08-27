@@ -60,6 +60,14 @@ class Config{
 		$correct = $this->check();
 	}
 	
+	public function reload(){	
+		unset($this->config);
+		unset($this->correct);
+		unset($this->type);
+		$this->load($this->file);
+		$correct = $this->check();
+	}
+	
 	public function load($file, $type = CONFIG_DETECT, $default = array()){
 		$this->correct = true;
 		$this->type = (int) $type;

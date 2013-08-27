@@ -64,6 +64,7 @@ class BlockAPI{
 		array(SLAB, 3),
 		array(SLAB, 4),
 		array(SLAB, 5),
+		array(SLAB, 6),
 		array(QUARTZ_BLOCK, 0),
 		array(QUARTZ_BLOCK, 1),
 		array(QUARTZ_BLOCK, 2),
@@ -275,7 +276,9 @@ class BlockAPI{
 			if($target->onBreak($item, $player) === false){
 				return $this->cancelAction($target, $player, false);
 			}
-			$item->useOn($target);
+			if($item->useOn($target) and ($player->gamemode & 0x01) === 0 and $item->getMetadata() >= $item->getMaxDurability()){
+				$player->setSlot($player->slot, new Item(AIR, 0, 0), false);
+			}
 			$drops = $target->getDrops($item, $player);
 		}else{
 			return $this->cancelAction($target, $player, false);
@@ -312,13 +315,11 @@ class BlockAPI{
 		if($target->isActivable === true){
 			if($this->server->api->dhandle("player.block.activate", array("player" => $player, "block" => $block, "target" => $target, "item" => $item)) !== false and $target->onActivate($item, $player) === true){
 				return false;
-			} else {
-				return $this->cancelAction($target, $player);
 			}
 		}
 		
 		if(($player->gamemode & 0x02) === 0x02){ //Adventure mode!!
-			return $this->cancelAction($block, $player);
+			return $this->cancelAction($block, $player, false);
 		}
 
 		if($block->y > 127 or $block->y < 0){
@@ -353,7 +354,7 @@ class BlockAPI{
 		if($this->server->api->dhandle("player.block.place", array("player" => $player, "block" => $block, "target" => $target, "item" => $item)) === false){
 			return $this->cancelAction($block, $player);
 		}elseif($hand->place($item, $player, $block, $target, $face, $fx, $fy, $fz) === false){
-			return $this->cancelAction($block, $player);
+			return $this->cancelAction($block, $player, false);
 		}
 		if($hand->getID() === SIGN_POST or $hand->getID() === WALL_SIGN){
 			$t = $this->server->api->tile->addSign($player->level, $block->x, $block->y, $block->z);

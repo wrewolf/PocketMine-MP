@@ -26,7 +26,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 class PocketChunkParser{
-	private $location, $raw = "", $file;
+	private $location, $raw = b"", $file;
 	var $sectorLength = 4096; //16 * 16 * 16
 	var $chunkLength = 86016; //21 * $sectorLength
 	var $map;
@@ -38,23 +38,14 @@ class PocketChunkParser{
 	private function loadLocationTable(){
 		$this->location = array();
 		console("[DEBUG] Loading Chunk Location table...", true, true, 2);
-		$chunkCnt = 0;
 		for($offset = 0; $offset < 0x1000; $offset += 4){
-			$data = substr($this->raw, $offset, 4);
-			$sectors = ord($data{0});
+			$data = Utils::readLInt(substr($this->raw, $offset, 4));
+			$sectors = $data & 0xff;
 			if($sectors === 0){
 				continue;
 			}
-			$x = ord($data{1});
-			$z = ord($data{2});
-			$X = $chunkCnt % 16;
-			$Z = $chunkCnt >> 4;
-			//$unused = ord($data{3});
-			if(!isset($this->location[$X])){
-				$this->location[$X] = array();
-			}
-			$this->location[$X][$Z] = $this->getOffset($X, $Z, $sectors);
-			++$chunkCnt;
+			$sectorLocation = $data >> 8;
+			$this->location[$offset >> 2] = $sectorLocation * $this->sectorLength;//$this->getOffset($X, $Z, $sectors);
 		}
 	}
 
@@ -84,17 +75,8 @@ class PocketChunkParser{
 		return true;
 	}
 
-	private function getOffsetPosition($X, $Z){
-        $data = substr($this->raw, ($X << 2) + ($Z << 7), 4); //$X * 4 + $Z * 128
-		return array(ord($data{0}), ord($data{1}), ord($data{2}), ord($data{3}));
-    }
-
-	private function getOffset($X, $Z, $sectors = 21){
-		return 0x1000 + (($X * $sectors) << 12) + (($Z * $sectors) << 16);
-    }
-
-	private function getOffsetLocation($X, $Z){
-		return $X << 2 + $Z << 7;
+	private function getOffset($X, $Z){
+		return $this->location[$X + ($Z << 5)];
     }
 
 	public function getChunk($X, $Z){
@@ -110,8 +92,7 @@ class PocketChunkParser{
 			return false;
 		}
 		$chunk = "";
-    $map=$this->map[$X][$Z];
-		foreach($map as $data){
+		foreach($this->map[$X][$Z] as $section => $data){
 			for($i = 0; $i < 256; ++$i){
 				$chunk .= $data[$i];
 			}
@@ -122,8 +103,8 @@ class PocketChunkParser{
 	public function parseChunk($X, $Z){
 		$X = (int) $X;
 		$Z = (int) $Z;
-		$offset = $this->location[$X][$Z];
-		//$len = Utils::readLInt(substr($this->raw, $offset, 4));
+		$offset = $this->getOffset($X, $Z);
+		$len = Utils::readLInt(substr($this->raw, $offset, 4));
 		$offset += 4;
 		$chunk = array(
 			0 => array(), //Block
@@ -153,7 +134,7 @@ class PocketChunkParser{
 				$this->map[$x][$z] = $this->parseChunk($x, $z);
 			}
 		}
-		$this->raw = "";
+		$this->raw = b"";
 		console("[DEBUG] Chunks loaded!", true, true, 2);
 	}
 
@@ -164,7 +145,7 @@ class PocketChunkParser{
 		flock($fp, LOCK_EX);
 		foreach($this->map as $x => $d){
 			foreach($d as $z => $chunk){
-				fseek($fp, $this->location[$x][$z]);
+				fseek($fp, $this->getOffset($x, $z));
 				fwrite($fp, $this->writeChunk($x, $z), $this->chunkLength);
 			}
 		}

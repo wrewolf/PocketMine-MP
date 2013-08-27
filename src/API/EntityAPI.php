@@ -115,9 +115,8 @@ class EntityAPI{
 	}
 
 	public function spawnToAll(Entity $e){
-    $players=$this->server->api->player->getAll($e->level);
-    foreach($players as $player){
-			if($player->eid !== false and $player->eid !== $e->eid){
+		foreach($this->server->api->player->getAll($e->level) as $player){
+			if($player->eid !== false and $player->eid !== $e->eid and $e->class !== ENTITY_PLAYER){
 				$e->spawn($player);
 			}
 		}
@@ -148,9 +147,10 @@ class EntityAPI{
 	}
 
 	public function spawnAll(Player $player){
-    $players=$this->getAll($player->level);
-		foreach($players as $e){
-			$e->spawn($player);
+		foreach($this->getAll($player->level) as $e){
+			if($e->class !== ENTITY_PLAYER){
+				$e->spawn($player);
+			}
 		}
 	}
 
@@ -161,6 +161,16 @@ class EntityAPI{
 			unset($this->entities[$eid]);
 			$entity->closed = true;
 			$this->server->query("DELETE FROM entities WHERE EID = ".$eid.";");
+			if($entity->class === ENTITY_PLAYER){
+				$this->server->api->player->broadcastPacket($this->server->api->player->getAll(), MC_REMOVE_PLAYER, array(
+					"clientID" => 0,
+					"eid" => $entity->eid,
+				));
+			}else{
+				$this->server->api->player->broadcastPacket($this->server->api->player->getAll($entity->level), MC_REMOVE_ENTITY, array(
+					"eid" => $entity->eid,
+				));
+			}
 			$this->server->api->dhandle("entity.remove", $entity);
 			$entity = null;
 			unset($entity);			

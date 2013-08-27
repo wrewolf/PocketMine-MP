@@ -381,11 +381,46 @@ class PlayerAPI{
     $time = $time_end - $time_start;
     console("player api add runtime: $time");
 	}
+	
+	public function spawnAllPlayers(Player $player){
+		foreach($this->getAll() as $p){
+			if($p !== $player and ($p->entity instanceof Entity)){
+				$p->entity->spawn($player);
+				if($p->level !== $player->level){
+					$player->dataPacket(MC_MOVE_ENTITY_POSROT, array(
+						"eid" => $p->entity->eid,
+						"x" => -256,
+						"y" => 128,
+						"z" => -256,
+						"yaw" => 0,
+						"pitch" => 0,
+					));
+				}
+			}
+		}
+	}
+	
+	public function spawnToAllPlayers(Player $player){
+		foreach($this->getAll() as $p){
+			if($p !== $player and ($p->entity instanceof Entity)){
+				$player->entity->spawn($p);
+				if($p->level !== $player->level){
+					$p->dataPacket(MC_MOVE_ENTITY_POSROT, array(
+						"eid" => $player->entity->eid,
+						"x" => -256,
+						"y" => 128,
+						"z" => -256,
+						"yaw" => 0,
+						"pitch" => 0,
+					));
+				}
+			}
+		}
+	}
 
 	public function remove($CID){
 		if(isset($this->server->clients[$CID])){
 			$player = $this->server->clients[$CID];
-			$this->server->clients[$CID] = null;
 			unset($this->server->clients[$CID]);
 			$player->close();
 			if($player->username != "" and ($player->data instanceof Config)){
@@ -393,8 +428,8 @@ class PlayerAPI{
 			}
 			$this->server->query("DELETE FROM players WHERE name = '".$player->username."';");
 			if($player->entity instanceof Entity){
-				$player->entity->player = null;
-				$player->entity = null;
+				unset($player->entity->player);
+				unset($player->entity);
 			}
 			$this->server->api->entity->remove($player->eid);
 			$player = null;
@@ -435,7 +470,7 @@ class PlayerAPI{
 			$data = new Config(DATA_PATH."players/".$iname.".yml", CONFIG_YAML, $default);
 		}
 
-		if(($this->server->gamemode & 0x01) === 0x01){
+		if(($data->get("gamemode") & 0x01) === 1){
 			$data->set("health", 20);
 		}
 		$this->server->handle("player.offline.get", $data);
