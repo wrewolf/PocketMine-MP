@@ -150,7 +150,6 @@ class ServerAPI{
 		$this->loadAPI("tile", "TileAPI");
 		$this->loadAPI("player", "PlayerAPI");
 		$this->loadAPI("time", "TimeAPI");
-		$this->loadAPI("mob", "MobAPI");
 		
 		foreach($this->apiList as $ob){
 			if(is_callable(array($ob, "init"))){
@@ -284,7 +283,7 @@ class ServerAPI{
 		if($this->getProperty("auto-save") === true){
 			$this->server->schedule(18000, array($this, "autoSave"), array(), true);	
 		}
-		if($this->getProperty("enable-rcon") === true){
+		if(!defined("NO_THREADS") and $this->getProperty("enable-rcon") === true){
 			$this->rcon = new RCON($this->getProperty("rcon.password", ""), $this->getProperty("rcon.port", $this->getProperty("server-port")), ($ip = $this->getProperty("server-ip")) != "" ? $ip:"0.0.0.0", $this->getProperty("rcon.threads", 1), $this->getProperty("rcon.clients-per-thread", 50));
 		}
 
