@@ -134,7 +134,7 @@ class BanAPI{
         foreach ($opls as $name => $enabled)
           if ($enabled)
             $tmp[] = $name;
-        $output = "Op's ". implode(', ',$tmp) ."\n";
+        $output = "Op's ". implode(', ',$tmp) ." \n";
         break;
 			case "deop":
 				$user = strtolower($params[0]);
