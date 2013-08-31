@@ -1591,8 +1591,8 @@ class Player{
 							MELON_SLICE => 2,
 							GOLDEN_APPLE => 10,
 							//COOKIE => 2,
-							COOKED_FISH => 5,
-							RAW_FISH => 2,
+							//COOKED_FISH => 5,
+							//RAW_FISH => 2,
 						);
 						$slot = $this->getSlot($this->slot);
 						if($this->entity->getHealth() < 20 and isset($items[$slot->getID()])){
@@ -1735,9 +1735,10 @@ class Player{
 				if(!isset($this->windows[$data["windowid"]])){
 					break;
 				}
+
 				if(is_array($this->windows[$data["windowid"]])){
 					$tiles = $this->windows[$data["windowid"]];
-					if($data["slot"] > 0 and $data["slot"] < CHEST_SLOTS){
+					if($data["slot"] >= 0 and $data["slot"] < CHEST_SLOTS){
 						$tile = $tiles[0];
 						$slotn = $data["slot"];
 						$offset = 0;
