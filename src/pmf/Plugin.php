@@ -31,6 +31,7 @@ class PMFPlugin extends PMF{
 		$this->load($file);
 		$this->parseInfo();
 		$this->parsePlugin();
+    console(print_r($this->pluginData,true));
 	}
 	
 	public function getPluginInfo(){
