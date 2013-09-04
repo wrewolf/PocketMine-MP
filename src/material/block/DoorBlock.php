@@ -25,6 +25,19 @@ class DoorBlock extends TransparentBlock{
 		$this->isSolid = false;
 	}
 
+	public function onUpdate($type){
+		if($type === BLOCK_UPDATE_NORMAL){
+			if($this->getSide(0)->getID() === AIR){ //Replace with common break method
+				$this->level->setBlock($this, new AirBlock(), false);
+				if($this->getSide(1) instanceof DoorBlock){
+					$this->level->setBlock($this->getSide(1), new AirBlock(), false);
+				}
+				return BLOCK_UPDATE_NORMAL;
+			}
+		}
+		return false;
+	}
+
 	public function place(Item $item, Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		if($face === 1){
 			$blockUp = $this->getSide(1);
@@ -45,10 +58,10 @@ class DoorBlock extends TransparentBlock{
 			if($next->getID() === $this->id or ($next2->isTransparent === false and $next->isTransparent === true)){ //Door hinge
 				$metaUp |= 0x01;
 			}
-			$this->level->setBlock($blockUp, BlockAPI::get($this->id, $metaUp)); //Top
+			$this->level->setBlock($blockUp, BlockAPI::get($this->id, $metaUp), true, false, true); //Top
 			
 			$this->meta = $direction & 0x03;
-			$this->level->setBlock($block, $this); //Bottom
+			$this->level->setBlock($block, $this, true, false, true); //Bottom
 			return true;			
 		}
 		return false;
@@ -58,15 +71,15 @@ class DoorBlock extends TransparentBlock{
 		if(($this->meta & 0x08) === 0x08){
 			$down = $this->getSide(0);
 			if($down->getID() === $this->id){
-				$this->level->setBlock($down, new AirBlock());
+				$this->level->setBlock($down, new AirBlock(), true, false, true);
 			}
 		}else{
 			$up = $this->getSide(1);
 			if($up->getID() === $this->id){
-				$this->level->setBlock($up, new AirBlock());
+				$this->level->setBlock($up, new AirBlock(), true, false, true);
 			}
 		}
-		$this->level->setBlock($this, new AirBlock());
+		$this->level->setBlock($this, new AirBlock(), true, false, true);
 		return true;
 	}
 	
@@ -75,13 +88,13 @@ class DoorBlock extends TransparentBlock{
 			$down = $this->getSide(0);
 			if($down->getID() === $this->id){
 				$meta = $down->getMetadata() ^ 0x04;
-				$this->level->setBlock($down, BlockAPI::get($this->id, $meta));
+				$this->level->setBlock($down, BlockAPI::get($this->id, $meta), true, false, true);
 				return true;
 			}
 			return false;
 		}else{
 			$this->meta ^= 0x04;
-			$this->level->setBlock($this, $this);
+			$this->level->setBlock($this, $this, true, false, true);
 		}
 		return true;
 	}
