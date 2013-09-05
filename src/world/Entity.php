@@ -112,7 +112,7 @@ class Entity extends Position{
 			case ENTITY_MOB:
 				$this->setHealth(isset($this->data["Health"]) ? $this->data["Health"]:10, "generic");
 				$this->update();
-				$this->setName((isset($mobs[$this->type]) ? $mobs[$this->type]:$this->type));
+				//$this->setName((isset($mobs[$this->type]) ? $mobs[$this->type]:$this->type));
 				$this->size = 1;
 				break;
 			case ENTITY_FALLING:
@@ -204,8 +204,7 @@ class Entity extends Position{
 	}
 	
 	private function spawnDrops(){
-    $drops=$this->getDrops();
-		foreach($drops as $drop){
+		foreach($this->getDrops() as $drop){
 			$this->server->api->entity->drop($this, BlockAPI::getItem($drop[0] & 0xFFFF, $drop[1] & 0xFFFF, $drop[2] & 0xFF), true);
 		}
 	}
@@ -214,8 +213,7 @@ class Entity extends Position{
 		$hasUpdate = false;
 		$time = microtime(true);
 		if($this->class === ENTITY_PLAYER and ($this->player instanceof Player) and $this->player->spawned === true and $this->player->blocked !== true){
-      $items=$this->server->api->entity->getRadius($this, 1.5, ENTITY_ITEM);
-			foreach($items as $item){
+			foreach($this->server->api->entity->getRadius($this, 1.5, ENTITY_ITEM) as $item){
 				if(($time - $item->spawntime) >= 0.6){
 					if((($this->player->gamemode & 0x01) === 1 or $this->player->hasSpace($item->type, $item->meta, $item->stack) === true) and $this->server->api->dhandle("player.pickup", array(
 						"eid" => $this->player->eid,
@@ -509,20 +507,21 @@ class Entity extends Position{
 			}
 		}
 		
-		$this->lastUpdate = $now;
+		
 		if($this->class !== ENTITY_PLAYER){
 			$this->updateMovement();
 			if($hasUpdate === true){
 				$this->server->schedule(5, array($this, "update"));
 			}
 		}
+		$this->lastUpdate = $now;
 	}
 	
 	public function updateMovement(){
 		if($this->closed === true){
 			return false;
 		}
-    $now = microtime(true);
+		$now = microtime(true);
 		if($this->isStatic === false and ($this->last[0] != $this->x or $this->last[1] != $this->y or $this->last[2] != $this->z or $this->last[3] != $this->yaw or $this->last[4] != $this->pitch)){
 			if($this->class === ENTITY_PLAYER or ($this->last[5] + 8) < $now){
 				if($this->server->api->handle("entity.move", $this) === false){
@@ -550,6 +549,7 @@ class Entity extends Position{
 				$this->updatePosition($this->x, $this->y, $this->z, $this->yaw, $this->pitch);
 			}
 		}
+		$this->lastUpdate = $now;
 	}
 
 	public function getDirection(){

@@ -351,7 +351,7 @@ class Player{
 					break;
 				}
 			}
-			if($add === 0){
+			if($add <= 0){
 				return false;
 			}
 			$count -= $add;
@@ -382,7 +382,7 @@ class Player{
 					break;
 				}
 			}
-			if($add === 0){
+			if($add <= 0){
 				return false;
 			}
 			$count -= $add;
@@ -407,7 +407,7 @@ class Player{
 					break;
 				}
 			}
-			if($remove === 0){
+			if($remove <= 0){
 				return false;
 			}
 			$count -= $remove;
@@ -1322,7 +1322,7 @@ class Player{
 						}
 					}
 					$speed = $this->entity->getSpeedMeasure();
-					if($this->blocked === true or ($this->server->api->getProperty("allow-flight") !== true and (($speed > 7 and ($this->gamemode & 0x01) === 0x00) or $speed > 15)) or $this->server->api->handle("player.move", $this->entity) === false){
+					if($this->blocked === true or ($this->server->api->getProperty("allow-flight") !== true and (($speed > 9 and ($this->gamemode & 0x01) === 0x00) or $speed > 20)) or $this->server->api->handle("player.move", $this->entity) === false){
 						if($this->lastCorrect instanceof Vector3){
 							$this->teleport($this->lastCorrect, $this->entity->yaw, $this->entity->pitch, false);
 						}
@@ -1618,6 +1618,7 @@ class Player{
 				}
 				$this->craftingItems = array();
 				$this->toCraft = array();
+				$this->teleport($this->spawnPosition);
 				if($this->entity instanceof Entity){
 					$this->entity->fire = 0;
 					$this->entity->air = 300;
@@ -1627,7 +1628,6 @@ class Player{
 					break;
 				}
 				$this->sendInventory();
-				$this->teleport($this->spawnPosition);
 				$this->blocked = false;
 				$this->server->handle("player.respawn", $this);
 				break;
@@ -1718,9 +1718,8 @@ class Player{
 				$this->toCraft = array();
 				if(isset($this->windows[$data["windowid"]])){
 					if(is_array($this->windows[$data["windowid"]])){
-						$all = $this->server->api->player->getAll($this->level);
 						foreach($this->windows[$data["windowid"]] as $ob){
-							$this->server->api->player->broadcastPacket($all, MC_TILE_EVENT, array(
+							$this->server->api->player->broadcastPacket($this->level->players, MC_TILE_EVENT, array(
 								"x" => $ob->x,
 								"y" => $ob->y,
 								"z" => $ob->z,
