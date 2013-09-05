@@ -116,6 +116,11 @@ class BanAPI{
 				$output .= "Command ran as ".$player->username.".\n";
 				break;
 			case "op":
+        if ($issuer != "console")
+        {
+          $output.="Only from Console";
+          break;
+        }
 				$user = strtolower($params[0]);
 				$player = $this->server->api->player->get($user);
 				if(!($player instanceof Player)){
