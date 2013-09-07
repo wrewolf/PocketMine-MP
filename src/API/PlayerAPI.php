@@ -379,7 +379,8 @@ class PlayerAPI{
 	}
 	
 	public function spawnAllPlayers(Player $player){
-		foreach($this->getAll() as $p){
+    $players=$this->getAll();
+		foreach($players as $p){
 			if($p !== $player and ($p->entity instanceof Entity)){
 				$p->entity->spawn($player);
 				if($p->level !== $player->level){
@@ -397,7 +398,8 @@ class PlayerAPI{
 	}
 	
 	public function spawnToAllPlayers(Player $player){
-		foreach($this->getAll() as $p){
+    $players=$this->getAll();
+		foreach($players as $p){
 			if($p !== $player and ($p->entity instanceof Entity)){
 				$player->entity->spawn($p);
 				if($p->level !== $player->level){
@@ -434,7 +436,7 @@ class PlayerAPI{
 	}
 
 	public function getOffline($name){
-    $time_start = microtime(true);
+    //$time_start = microtime(true);
 		$iname = strtolower($name);
 		$default = array(
 			"caseusername" => $name,
@@ -470,9 +472,9 @@ class PlayerAPI{
 			$data->set("health", 20);
 		}
 		$this->server->handle("player.offline.get", $data);
-    $time_end = microtime(true);
-    $time = $time_end - $time_start;
-    console("player api getOffline runtime: $time");
+    //$time_end = microtime(true);
+    //$time = $time_end - $time_start;
+    //console("player api getOffline runtime: $time");
 		return $data;
 	}
 

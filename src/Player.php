@@ -293,7 +293,8 @@ class Player{
 	}
 	
 	public function sleepOn(Vector3 $pos){
-		foreach($this->server->api->player->getAll($this->level) as $p){
+    $players=$this->server->api->player->getAll($this->level);
+		foreach($players as $p){
 			if($p->isSleeping instanceof Vector3){
 				if($pos->distance($p->isSleeping) <= 0.1){
 					return false;
@@ -320,13 +321,15 @@ class Player{
 	public function checkSleep(){
 		if($this->isSleeping !== false){
 			if($this->server->api->time->getPhase($this->level) === "night"){
-				foreach($this->server->api->player->getAll($this->level) as $p){
+        $players=$this->server->api->player->getAll($this->level);
+				foreach($players as $p){
 					if($p->isSleeping === false){
 						return false;
 					}
 				}
 				$this->server->api->time->set("day", $this->level);
-				foreach($this->server->api->player->getAll($this->level) as $p){
+        $players=$this->server->api->player->getAll($this->level);
+				foreach($players as $p){
 					$p->stopSleep();
 				}
 			}
@@ -764,8 +767,8 @@ class Player{
 					$this->entity->check = true;
 					return false;
 				}
-
-				foreach($this->server->api->entity->getAll($this->level) as $e){
+$entityes=$this->server->api->entity->getAll($this->level);
+				foreach($entityes as $e){
 					if($e !== $this->entity){
 						if($e->player instanceof Player){
 							$e->player->dataPacket(MC_MOVE_ENTITY_POSROT, array(
@@ -802,8 +805,8 @@ class Player{
 					"time" => $this->level->getTime(),
 				));
 				$terrain = true;
-				
-				foreach($this->server->api->player->getAll($this->level) as $player){
+				$players=$this->server->api->player->getAll($this->level);
+				foreach($players as $player){
 					if($player !== $this and $player->entity instanceof Entity){
 						$this->dataPacket(MC_MOVE_ENTITY_POSROT, array(
 							"eid" => $player->entity->eid,
@@ -1200,8 +1203,9 @@ class Player{
 					$this->data->set("inventory", $inv);
 				}
 				$this->data->set("caseusername", $this->username);
-				$this->inventory = array();		
-				foreach($this->data->get("inventory") as $slot => $item){
+				$this->inventory = array();
+        $inventory=$this->data->get("inventory");
+				foreach($inventory as $slot => $item){
 					if(!is_array($item) or count($item) < 3){
 						$item = array(AIR, 0, 0);
 					}
@@ -1209,7 +1213,8 @@ class Player{
 				}
 
 				$this->armor = array();
-				foreach($this->data->get("armor") as $slot => $item){
+        $armorslot=$this->data->get("armor");
+				foreach($armorslot as $slot => $item){
 					$this->armor[$slot] = BlockAPI::getItem($item[0], $item[1], $item[0] === 0 ? 0:1);
 				}
 				

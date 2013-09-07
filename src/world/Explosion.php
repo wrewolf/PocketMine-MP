@@ -85,8 +85,8 @@ class Explosion{
 		$send = array();
 		$airblock = new AirBlock();
 		$source = $this->source->floor();
-		
-		foreach($server->api->entity->getRadius($this->source, 10) as $entity){
+		$radius=$server->api->entity->getRadius($this->source, 10);
+		foreach($radius as $entity){
 			$impact = (1 - $this->source->distance($entity) / 10);
 			$damage = (int) (($impact * $impact + $impact) * 4 * $this->size + 1);
 			$entity->harm($damage, "explosion");

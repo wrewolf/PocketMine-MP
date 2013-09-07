@@ -109,7 +109,8 @@ class EntityAPI{
 	}
 
 	public function spawnToAll(Entity $e){
-		foreach($this->server->api->player->getAll($e->level) as $player){
+    $players=$this->server->api->player->getAll($e->level);
+		foreach($players as $player){
 			if($player->eid !== false and $player->eid !== $e->eid and $e->class !== ENTITY_PLAYER){
 				$e->spawn($player);
 			}
@@ -141,7 +142,8 @@ class EntityAPI{
 	}
 
 	public function spawnAll(Player $player){
-		foreach($this->getAll($player->level) as $e){
+    $entityes=$this->getAll($player->level);
+		foreach($entityes as $e){
 			if($e->class !== ENTITY_PLAYER){
 				$e->spawn($player);
 			}

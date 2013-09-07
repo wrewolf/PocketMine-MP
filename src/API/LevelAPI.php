@@ -125,15 +125,18 @@ class LevelAPI{
 		console("[INFO] Unloading level \"".$name."\"");
 		$level->nextSave = PHP_INT_MAX;
 		$level->save();
-		foreach($this->server->api->player->getAll($level) as $player){
+    $players=$this->server->api->player->getAll($level);
+		foreach($players as $player){
 			$player->teleport($this->server->spawn);
 		}
-		foreach($this->server->api->entity->getAll($level) as $entity){
+    $entityes=$this->server->api->entity->getAll($level);
+		foreach($entityes as $entity){
 			if($entity->class !== ENTITY_PLAYER){
 				$entity->close();
 			}
 		}
-		foreach($this->server->api->tile->getAll($level) as $tile){
+    $tiles=$this->server->api->tile->getAll($level);
+		foreach($tiles as $tile){
 			$tile->close();
 		}
 		$level->close();
@@ -194,8 +197,8 @@ class LevelAPI{
 			$t = $this->server->api->tile->add($this->levels[$name], $tile["id"], $tile["x"], $tile["y"], $tile["z"], $tile);
 		}
 		
-		$timeu = microtime(true);
-		foreach($blockUpdates->getAll() as $bupdate){
+		$bu=$blockUpdates->getAll();
+		foreach($bu as $bupdate){
 			$this->server->api->block->scheduleBlockUpdate(new Position((int) $bupdate["x"],(int) $bupdate["y"],(int) $bupdate["z"], $this->levels[$name]), (float) $bupdate["delay"], (int) $bupdate["type"]);
 		}
 		return true;

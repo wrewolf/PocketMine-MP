@@ -205,14 +205,16 @@ class ConsoleAPI{
 						case "a":
 						case "all":
 							$output = "";
-							foreach($this->server->api->player->getAll() as $p){
+              $players=$this->server->api->player->getAll();
+							foreach($players as $p){
 								$output .= $this->run($cmd . " ". substr_replace($params, $p->username, $selector[1] + $offsetshift - 1, strlen($selector[0]) + 1), $issuer, $alias);
 							}
 							return $output;
 						case "r":
 						case "random":
 							$l = array();
-							foreach($this->server->api->player->getAll() as $p){
+              $players=$this->server->api->player->getAll()
+							foreach($players as $p){
 								if($p !== $issuer){
 									$l[] = $p;
 								}
