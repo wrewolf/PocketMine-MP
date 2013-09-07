@@ -1170,7 +1170,7 @@ $entityes=$this->server->api->entity->getAll($this->level);
 				}
 				$this->loggedIn = true;
 				
-				$u = $this->server->api->player->get($this->iusername);
+				$u = $this->server->api->player->get($this->iusername, false);
 				if($u !== false){
 					$u->close("logged in from another location");
 				}
@@ -1303,10 +1303,12 @@ $entityes=$this->server->api->entity->getAll($this->level);
 						$this->dataPacket(MC_SET_TIME, array(
 							"time" => $this->level->getTime(),
 						));
-						$this->teleport(new Position($this->data->get("position")["x"], $this->data->get("position")["y"], $this->data->get("position")["z"], $this->level));
-						$this->server->schedule(10, array($this, "teleport"), new Position($this->data->get("position")["x"], $this->data->get("position")["y"], $this->data->get("position")["z"], $this->level));
-						$this->server->schedule(20, array($this, "teleport"), new Position($this->data->get("position")["x"], $this->data->get("position")["y"], $this->data->get("position")["z"], $this->level));
-						$this->server->schedule(30, array($this, "teleport"), new Position($this->data->get("position")["x"], $this->data->get("position")["y"], $this->data->get("position")["z"], $this->level));
+						$pos = new Position($this->data->get("position")["x"], $this->data->get("position")["y"], $this->data->get("position")["z"], $this->level);
+						$pos = $this->level->getSafeSpawn($pos);
+						$this->teleport($pos);
+						$this->server->schedule(10, array($this, "teleport"), $pos);
+						$this->server->schedule(20, array($this, "teleport"), $pos);
+						$this->server->schedule(30, array($this, "teleport"), $pos);
 						$this->server->handle("player.spawn", $this);
 						break;
 					case 2://Chunk loaded?
