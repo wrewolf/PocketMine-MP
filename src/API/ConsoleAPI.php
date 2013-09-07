@@ -213,7 +213,7 @@ class ConsoleAPI{
 						case "r":
 						case "random":
 							$l = array();
-              $players=$this->server->api->player->getAll()
+              $players=$this->server->api->player->getAll();
 							foreach($players as $p){
 								if($p !== $issuer){
 									$l[] = $p;
