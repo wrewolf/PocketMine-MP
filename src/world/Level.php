@@ -20,7 +20,7 @@
 */
 
 class Level{
-	public $entities, $tiles, $blockUpdates, $nextSave, $players = array(),$level;
+	public $entities, $tiles, $blockUpdates, $nextSave, $players = array(), $level;
 	private $time, $startCheck, $startTime, $server, $name, $usedChunks, $changedBlocks, $changedCount;
 	
 	public function __construct(PMFLevel $level, Config $entities, Config $tiles, Config $blockUpdates, $name){
@@ -146,8 +146,7 @@ class Level{
 		
 		if($extra !== false){
 			$entities = array();
-      $entitiesA=$this->server->api->entity->getAll($this);
-			foreach($entitiesA as $entity){
+			foreach($this->server->api->entity->getAll($this) as $entity){
 				if($entity->class === ENTITY_MOB){
 					$entities[] = array(
 						"id" => $entity->type,
@@ -169,8 +168,8 @@ class Level{
 						$entities[] = array(
 							"id" => $entity->type,
 							"TileX" => $entity->x,
-							"TileY" => $entity->y,
-							"TileZ" => $entity->z,
+							"TileX" => $entity->y,
+							"TileX" => $entity->z,
 							"Health" => $entity->health,
 							"Motive" => $entity->data["Motive"],
 							"Pos" => array(
@@ -237,8 +236,7 @@ class Level{
 			$this->entities->setAll($entities);
 			$this->entities->save();
 			$tiles = array();
-      $tilesA=$this->server->api->tile->getAll($this);
-			foreach($tilesA as $tile){
+			foreach($this->server->api->tile->getAll($this) as $tile){		
 				$tiles[] = $tile->data;
 			}
 			$this->tiles->setAll($tiles);
@@ -265,6 +263,11 @@ class Level{
 		$this->nextSave = microtime(true) + 45;
 	}
 	
+	public function getBlockRaw(Vector3 $pos){
+		$b = $this->level->getBlock($pos->x, $pos->y, $pos->z);
+		return BlockAPI::get($b[0], $b[1], new Position($pos->x, $pos->y, $pos->z, $this));
+	}
+	
 	public function getBlock(Vector3 $pos){
 		if(!isset($this->level) or ($pos instanceof Position) and $pos->level !== $this){
 			return false;
@@ -274,9 +277,6 @@ class Level{
 	}
 	
 	public function setBlockRaw(Vector3 $pos, Block $block, $direct = true, $send = true){
-		if(!isset($this->level)){
-			return false;
-		}
 		if(($ret = $this->level->setBlock($pos->x, $pos->y, $pos->z, $block->getID(), $block->getMetadata())) === true and $send !== false){
 			if($direct === true){
 				$this->server->api->player->broadcastPacket($this->players, MC_UPDATE_BLOCK, array(
@@ -350,7 +350,7 @@ class Level{
 		if(!isset($this->level)){
 			return false;
 		}
-		return $this->level->getMiniChunk($X, $Y, $Z);
+		return $this->level->getMiniChunk($X, $Z);
 	}
 	
 	public function setMiniChunk($X, $Y, $Z, $data){
