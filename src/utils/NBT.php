@@ -21,7 +21,7 @@
 
 class NBT{
 	public $tree = array();
-	public $binary = b"";
+	public $binary = "";
 	private $offset = 0;
 
 	const TAG_END = 0;
