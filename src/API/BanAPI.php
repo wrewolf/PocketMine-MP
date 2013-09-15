@@ -146,8 +146,10 @@ class BanAPI{
 				$user = strtolower($params[0]);
 				$player = $this->server->api->player->get($user);
 				if(!($player instanceof Player)){
-					$this->ops->set($user, false);
-					$this->ops->save($user);
+					//$this->ops->set($user, false);
+					//$this->ops->save($user);
+          $this->ops->remove($user);
+          $this->ops->save();
 					$output .= $user." is no longer op\n";
 					break;
 				}
