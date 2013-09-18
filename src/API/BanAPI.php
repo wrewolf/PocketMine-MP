@@ -146,13 +146,13 @@ class BanAPI{
 				$user = strtolower($params[0]);
 				$player = $this->server->api->player->get($user);
 				if(!($player instanceof Player)){
-					//$this->ops->set($user, false);
-					//$this->ops->save($user);
+					$this->ops->set($user, false);
           $this->ops->remove($user);
-          $this->ops->save();
+          $this->ops->save($user);
 					$output .= $user." is no longer op\n";
 					break;
 				}
+        $this->ops->set($player->iusername, false);
 				$this->ops->remove($player->iusername);
 				$this->ops->save();
 				$output .= $player->iusername." is not longer op\n";
