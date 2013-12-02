@@ -204,17 +204,32 @@ class ConsoleAPI{
 							break;
 						case "a":
 						case "all":
-							$output = "";
-              $players=$this->server->api->player->getAll();
-							foreach($players as $p){
-								$output .= $this->run($cmd . " ". substr_replace($params, $p->username, $selector[1] + $offsetshift - 1, strlen($selector[0]) + 1), $issuer, $alias);
+							if($issuer instanceof Player)
+							{
+								if($this->server->api->ban->isOp($issuer->username))
+								{
+									$output = "";
+									foreach($this->server->api->player->getAll() as $p){
+										$output .= $this->run($cmd . " ". substr_replace($params, $p->username, $selector[1] + $offsetshift - 1, strlen($selector[0]) + 1), $issuer, $alias);
+									}
+								}
+								else
+								{
+									$issuer->sendChat("You don't have permissions to use this command.\n");
+								}
+							}
+							else
+							{
+								$output = "";
+								foreach($this->server->api->player->getAll() as $p){
+									$output .= $this->run($cmd . " ". substr_replace($params, $p->username, $selector[1] + $offsetshift - 1, strlen($selector[0]) + 1), $issuer, $alias);
+								}
 							}
 							return $output;
 						case "r":
 						case "random":
 							$l = array();
-              $players=$this->server->api->player->getAll();
-							foreach($players as $p){
+							foreach($this->server->api->player->getAll() as $p){
 								if($p !== $issuer){
 									$l[] = $p;
 								}
@@ -258,7 +273,7 @@ class ConsoleAPI{
 			return;
 		}
 		if($this->loop->line !== false){
-			$line = trim($this->loop->line);
+			$line = preg_replace("#\\x1b\\x5b([^\\x1b]*\\x7e|[\\x40-\\x50])#", "", trim($this->loop->line));
 			$this->loop->line = false;
 			$output = $this->run($line, "console");
 			if($output != ""){

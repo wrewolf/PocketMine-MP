@@ -167,6 +167,13 @@ class Entity extends Position{
 					$inv[] = array($slot->getID(), $slot->getMetadata(), $slot->count);
 				}
 			}
+			for($re = 0; $re < 4; $re++){
+				$slot = $this->player->getArmor($re);
+				$this->player->setArmor($re, BlockAPI::getItem(AIR, 0, 0));
+				if($slot->getID() !== AIR and $slot->count > 0){
+					$inv[] = array($slot->getID(), $slot->getMetadata(), $slot->count);
+				}
+			}
 			return $inv;
 		}elseif($this->class === ENTITY_OBJECT){
 			switch($this->type){
@@ -310,6 +317,9 @@ class Entity extends Position{
 			}else{
 				$hasUpdate = true;
 			}
+			if(($this->player instanceof Player) and ($this->player->gamemode & 0x01) === CREATIVE){ //Remove fire effects in next tick
+				$this->fire = 1;
+			}
 		}
 		
 		$startX = (int) (round($this->x - 0.5) - 1);
@@ -403,7 +413,8 @@ class Entity extends Position{
 		
 		if($this->isStatic === false){
 			$startX = floor($this->x - 0.5 - $this->size - 1);
-			$y = (int) round($this->y - 1);
+			//prefix for flying when player on fence
+			$y = (int) floor($this->y - 1);
 			$startZ = floor($this->z - 0.5 - $this->size - 1);
 			$endX = ceil($this->x - 0.5 + $this->size + 1);
 			$endZ = ceil($this->z - 0.5 + $this->size + 1);
@@ -418,7 +429,7 @@ class Entity extends Position{
 							$support = true;
 							$isFlying = false;
 							break;
-						}elseif(($b instanceof LiquidBlock) or $b->getID() === COBWEB or $b->getID() === LADDER or $b->getID() === FENCE){
+						}elseif(($b instanceof LiquidBlock) or $b->getID() === COBWEB or $b->getID() === LADDER or $b->getID() === FENCE or $b->getID() === STONE_WALL){
 							$isFlying = false;
 						}
 					}
@@ -796,7 +807,7 @@ class Entity extends Position{
 	}
 
 	public function setPosition(Vector3 $pos, $yaw = false, $pitch = false){
-		if($pos instanceof Position){
+		if($pos instanceof Position and $this->level !== $pos->level){
 			$this->level = $pos->level;
 			$this->server->preparedSQL->entity->setLevel->reset();
 			$this->server->preparedSQL->entity->setLevel->clear();

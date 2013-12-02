@@ -33,8 +33,9 @@ The entire server is done in PHP, and has been tested, profiled and optimized to
 
 ### [Twitter @PocketMine](https://twitter.com/PocketMine)
 
-## IRC #pocketmine (or #mcpedevs) @ irc.freenode.net
-* [WebIRC](http://webchat.freenode.net?channels=pocketmine,mcpedevs&uio=d4)
+## IRC Chat #pocketmine (or #mcpedevs) @ irc.freenode.net
+[![#pocketmine channel WebIRC](https://kiwiirc.com/buttons/chat.freenode.net/pocketmine.png)](https://kiwiirc.com/client/chat.freenode.net/#pocketmine)
+[![#mcpedevs channel WebIRC](https://kiwiirc.com/buttons/chat.freenode.net/mcpedevs.png)](https://kiwiirc.com/client/chat.freenode.net/#mcpedevs)
 
 
 ## Third-party Libraries/Protocols Used

@@ -85,7 +85,7 @@ class PluginAPI extends stdClass{
 			return false;
 		}
 		if(eval($info["code"]) === false or ($info["class"] !== "none" and !class_exists($info["class"]))){
-			console("[ERROR] Failed loading plugin: evaluation error");
+			console("[ERROR] Failed loading {$info['name']}: evaluation error");
 			return false;
 		}
 		
@@ -121,12 +121,19 @@ class PluginAPI extends stdClass{
 		return false;
 	}
 	
+	public function pluginsPath(){
+		$path = join(DIRECTORY_SEPARATOR, array(DATA_PATH."plugins", ""));
+		@mkdir($path);
+		return $path;
+	}
+	
+	
 	public function configPath(Plugin $plugin){
 		$p = $this->get($plugin);
 		if($p === false){
 			return false;
 		}
-		$path = DATA_PATH."plugins/".$p[1]["name"]."/";
+		$path = $this->pluginsPath() . $p[1]["name"] . DIRECTORY_SEPARATOR;
 		$this->plugins[$p[1]["class"]][1]["path"] = $path;
 		@mkdir($path);
 		return $path;
@@ -170,12 +177,12 @@ class PluginAPI extends stdClass{
 	}
 
 	public function loadAll(){
-		$dir = dir(DATA_PATH."plugins/");
+		$dir = dir($this->pluginsPath());
 		while(false !== ($file = $dir->read())){
 			if($file{0} !== "."){
 				$ext = strtolower(substr($file, -3));
 				if($ext === "php" or $ext === "pmf"){
-					$this->load(DATA_PATH."plugins/" . $file);
+					$this->load($dir->path . $file);
 				}
 			}
 		}

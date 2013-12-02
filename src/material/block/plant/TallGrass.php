@@ -22,7 +22,7 @@
 class TallGrassBlock extends FlowableBlock{
 	public function __construct($meta = 1){
 		parent::__construct(TALL_GRASS, $meta, "Tall Grass");
-		$this->isReplaceable = true;
+		//$this->isReplaceable = true;
 		$names = array(
 			0 => "Dead Shrub",
 			1 => "Tall Grass",
@@ -44,8 +44,24 @@ class TallGrassBlock extends FlowableBlock{
 	
 	public function getDrops(Item $item, Player $player){
 		$drops = array();
-		if(mt_rand(1,10) === 1){//Seeds
-			$drops[] = array(WHEAT_SEEDS, 0, 1);
+		$possibleDrops = array(
+			array(WHEAT_SEEDS, 0, 1),
+			array(CARROT, 0, 1),
+			array(POTATO, 0, 1),
+			array(BEETROOT_SEEDS, 0, 1),
+			array(MELON_SEEDS, 0, 1),
+			array(PUMPKIN_SEEDS, 0, 1),
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+		);
+		if(($item = $possibleDrops[mt_rand(0, count($possibleDrops) - 1)]) !== 0){
+			$drops[] = $item;
 		}
 		return $drops;
 	}

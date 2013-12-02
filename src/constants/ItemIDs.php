@@ -100,7 +100,8 @@ define("BUCKET", 325);
 
 
 define("IRON_DOOR", 330);
-
+define("REDSTONE", 331);
+define("REDSTONE_DUST", 331);
 define("SNOWBALL", 332);
 
 define("LEATHER", 334);
@@ -116,6 +117,7 @@ define("SLIMEBALL", 341);
 define("EGG", 344);
 define("COMPASS", 345);
 
+define("CLOCK", 347);
 define("GLOWSTONE_DUST", 348);
 //define("RAW_FISH", 349);
 //define("COOKED_FISH", 350);
@@ -132,7 +134,7 @@ define("BED", 355);
 define("SHEARS", 359);
 define("MELON", 360);
 define("MELON_SLICE", 360);
-
+define("PUMPKIN_SEEDS", 361);
 define("MELON_SEEDS", 362);
 define("RAW_BEEF", 363);
 define("STEAK", 364);
@@ -143,8 +145,21 @@ define("COOKED_CHICKEN", 366);
 
 define("SPAWN_EGG", 383);
 
+define("CARROT", 391);
+define("CARROTS", 391);
+define("POTATO", 392);
+define("POTATOES", 392);
+define("BAKED_POTATO", 393);
+define("BAKED_POTATOES", 393);
+
+define("PUMPKIN_PIE", 400);
+
 define("NETHER_BRICK", 405);
 define("QUARTZ", 406);
 define("NETHER_QUARTZ", 406);
 
 define("CAMERA", 456);
+define("BEETROOT", 457);
+define("BEETROOT_SEEDS", 458);
+define("BEETROOT_SEED", 458);
+define("BEETROOT_SOUP", 459);

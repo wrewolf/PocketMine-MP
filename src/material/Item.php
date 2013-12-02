@@ -23,7 +23,13 @@ class Item{
 	public static $class = array(
 		SUGARCANE => "SugarcaneItem",	
 		WHEAT_SEEDS => "WheatSeedsItem",
+		PUMPKIN_SEEDS => "PumpkinSeedsItem",
 		MELON_SEEDS => "MelonSeedsItem",
+		MUSHROOM_STEW => "MushroomStewItem",
+		BEETROOT_SOUP => "BeetrootSoupItem",
+		CARROT => "CarrotItem",
+		POTATO => "PotatoItem",
+		BEETROOT_SEEDS => "BeetrootSeedsItem",
 		SIGN => "SignItem",
 		WOODEN_DOOR => "WoodenDoorItem",
 		BUCKET => "BucketItem",
@@ -137,6 +143,10 @@ class Item{
 				$this->meta++;
 			}
 			return true;
+		}elseif($this->isHoe()){
+			if(($object instanceof Block) and ($object->getID() === GRASS or $object->getID() === DIRT)){
+				$this->meta++;
+			}
 		}
 		return false;
 	}

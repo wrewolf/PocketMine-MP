@@ -21,8 +21,13 @@
 
 class PocketMinecraftServer{
 	public $tCnt;
-	public $serverID, $interface, $database, $version, $invisible, $api, $tickMeasure, $preparedSQL, $seed, $gamemode, $name, $maxClients, $clients, $eidCnt, $custom, $description, $motd, $port, $saveEnabled;
+	public $serverID, $interface, $database, $version, $invisible, $tickMeasure, $preparedSQL, $seed, $gamemode, $name, $maxClients, $clients, $eidCnt, $custom, $description, $motd, $port, $saveEnabled;
 	private $serverip, $evCnt, $handCnt, $events, $eventsID, $handlers, $serverType, $lastTick, $ticks, $memoryStats, $async = array(), $asyncID = 0;
+
+	/**
+	 * @var ServerAPI
+	 */
+	public $api;
 	
 	private function load(){
 		$this->version = new VersionString();
@@ -80,7 +85,10 @@ class PocketMinecraftServer{
 		$this->load();
 	}
 
-	public function getTPS(){
+    /**
+     * @return float
+     */
+    public function getTPS(){
 		$v = array_values($this->tickMeasure);
 		$tps = 40 / ($v[39] - $v[0]);
 		return round($tps, 4);
@@ -174,7 +182,10 @@ class PocketMinecraftServer{
 		return $info;
 	}
 
-	public function close($reason = "server stop"){
+    /**
+     * @param string $reason
+     */
+    public function close($reason = "server stop"){
 		if($this->stop !== true){
 			if(is_int($reason)){
 				$reason = "signal stop";
@@ -268,7 +279,14 @@ class PocketMinecraftServer{
 		}
 	}
 
-	public function addHandler($event,callable $callable, $priority = 5){
+    /**
+     * @param string $event
+     * @param callable $callable
+     * @param integer $priority
+     *
+     * @return boolean
+     */
+    public function addHandler($event,callable $callable, $priority = 5){
 		if(!is_callable($callable)){
 			return false;
 		}elseif(isset(Deprecation::$events[$event])){
@@ -336,7 +354,10 @@ class PocketMinecraftServer{
 		}
 	}*/
 
-	public function getGamemode(){
+    /**
+     * @return string
+     */
+    public function getGamemode(){
 		switch($this->gamemode){
 			case SURVIVAL:
 				return "survival";

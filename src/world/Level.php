@@ -26,6 +26,7 @@ class Level{
 	public function __construct(PMFLevel $level, Config $entities, Config $tiles, Config $blockUpdates, $name){
 		$this->server = ServerAPI::request();
 		$this->level = $level;
+		$this->level->level = $this;
 		$this->entities = $entities;
 		$this->tiles = $tiles;
 		$this->blockUpdates = $blockUpdates;
@@ -350,7 +351,7 @@ class Level{
 		if(!isset($this->level)){
 			return false;
 		}
-		return $this->level->getMiniChunk($X, $Z);
+		return $this->level->getMiniChunk($X, $Z, $Y);
 	}
 	
 	public function setMiniChunk($X, $Y, $Z, $data){
@@ -358,7 +359,7 @@ class Level{
 			return false;
 		}
 		$this->changedCount[$X.":".$Y.":".$Z] = 4096;
-		return $this->level->setMiniChunk($X, $Y, $Z, $data);
+		return $this->level->setMiniChunk($X, $Z, $Y, $data);
 	}
 	
 	public function loadChunk($X, $Z){

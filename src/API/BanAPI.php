@@ -52,12 +52,20 @@ class BanAPI{
 		$this->server->addHandler("player.block.place", array($this, "permissionsCheck"), 1);//Event handler for blocks
 		$this->server->addHandler("player.flying", array($this, "permissionsCheck"), 1);//Flying Event
 	}
-	
-	public function cmdWhitelist($cmd){//Whitelists a CMD so everyone can issue it - Even non OPs.
+
+    /**
+     * @param string $cmd Command to Whitelist
+     */
+    public function cmdWhitelist($cmd){//Whitelists a CMD so everyone can issue it - Even non OPs.
 		$this->cmdWhitelist[strtolower(trim($cmd))] = true;
 	}
-	
-	public function isOp($username){//Is a player op?
+
+    /**
+     * @param string $username
+     *
+     * @return boolean
+     */
+    public function isOp($username){//Is a player op?
 		$username = strtolower($username);
 		if($this->server->api->dhandle("op.check", $username) === true){
 			return true;
@@ -66,8 +74,14 @@ class BanAPI{
 		}
 		return false;	
 	}
-	
-	public function permissionsCheck($data, $event){
+
+    /**
+     * @param mixed $data
+     * @param string $event
+     *
+     * @return boolean
+     */
+    public function permissionsCheck($data, $event){
 		switch($event){
 			case "player.flying"://OPs can fly around the server.
 				if($this->isOp($data->iusername)){
@@ -101,8 +115,16 @@ class BanAPI{
 			break;
 		}
 	}
-	
-	public function commandHandler($cmd, $params, $issuer, $alias){
+
+    /**
+     * @param string $cmd
+     * @param array $params
+     * @param string $issuer
+     * @param string $alias
+     *
+     * @return string
+     */
+    public function commandHandler($cmd, $params, $issuer, $alias){
 		$output = "";
 		switch($cmd){
 			case "sudo":
@@ -155,7 +177,7 @@ class BanAPI{
         $this->ops->set($player->iusername, false);
 				$this->ops->remove($player->iusername);
 				$this->ops->save();
-				$output .= $player->iusername." is not longer op\n";
+				$output .= $player->iusername." is no longer op\n";
 				$this->server->api->chat->sendTo(false, "You are no longer op.", $player->iusername);
 				break;
 			case "kick":
@@ -169,7 +191,9 @@ class BanAPI{
 					}else{
 						$reason = implode(" ", $params);
 						$reason = $reason == "" ? "No reason":$reason;
-						$player->close("You have been kicked: ".$reason);
+						
+						$this->server->schedule(60, array($player, "close"), "You have been kicked: ".$reason); //Forces a kick
+						$player->blocked = true;
 						if($issuer instanceof Player){
 							$this->server->api->chat->broadcast($player->username." has been kicked by ".$issuer->username.": $reason\n");
 						}else{
@@ -290,24 +314,40 @@ class BanAPI{
 		}
 		return $output;
 	}
-	
-	public function ban($username){
+
+    /**
+     * @param string $username
+     */
+    public function ban($username){
 		$this->commandHandler("ban", array("add", $username), "console", "");
 	}
-	
+
+    /**
+     * @param string $username
+     */
 	public function pardon($username){
 		$this->commandHandler("ban", array("pardon", $username), "console", "");
 	}
-	
+
+    /**
+     * @param string $ip
+     */
 	public function banIP($ip){
 		$this->commandHandler("banip", array("add", $ip), "console", "");
 	}
-	
+
+    /**
+     * @param string $ip
+     */
 	public function pardonIP($ip){
 		$this->commandHandler("banip", array("pardon", $ip), "console", "");
 	}
-	
-	public function kick($username, $reason = "No Reason"){
+
+    /**
+     * @param string $username
+     * @param string $reason
+     */
+    public function kick($username, $reason = "No Reason"){
 		$this->commandHandler("kick", array($username, $reason), "console", "");
 	}
 	
@@ -316,8 +356,13 @@ class BanAPI{
 		$this->commandHandler("banip", array("reload"), "console", "");
 		$this->commandHandler("whitelist", array("reload"), "console", "");
 	}
-	
-	public function isIPBanned($ip){
+
+    /**
+     * @param string $ip
+     *
+     * @return boolean
+     */
+    public function isIPBanned($ip){
 		if($this->server->api->dhandle("api.ban.ip.check", $ip) === false){
 			return true;
 		}elseif($this->bannedIPs->exists($ip)){
@@ -325,8 +370,13 @@ class BanAPI{
 		}
 		return false;
 	}
-	
-	public function isBanned($username){
+
+    /**
+     * @param string $username
+     *
+     * @return boolean
+     */
+    public function isBanned($username){
 		$username = strtolower($username);
 		if($this->server->api->dhandle("api.ban.check", $username) === false){
 			return true;
@@ -335,8 +385,13 @@ class BanAPI{
 		}
 		return false;	
 	}
-	
-	public function inWhitelist($username){
+
+    /**
+     * @param string $username
+     *
+     * @return boolean
+     */
+    public function inWhitelist($username){
 		$username = strtolower($username);
 		if($this->isOp($username)){
 			return true;
