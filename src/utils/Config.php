@@ -33,6 +33,7 @@ class Config{
 	private $file;
 	private $correct;
 	private $type = CONFIG_DETECT;
+  private $False=false; //Waring remove "Only variable references should be returned by reference" in "/opt/mine/mem/src/utils/Config.php" at line 171
 	public static $formats = array(
 		"properties" => CONFIG_PROPERTIES,
 		"cnf" => CONFIG_CNF,
@@ -165,10 +166,10 @@ class Config{
 	public function __unset($k){
 		return $this->remove($k);
 	}
-	
+
 	public function &get($k){
 		if($this->correct === false or !isset($this->config[$k])){
-			return false;
+			return $this->False;
 		}
 		return $this->config[$k];
 	}

@@ -160,6 +160,10 @@ class PlayerAPI{
                 $output .= "ping ".round($issuer->getLag(), 2)."ms, packet loss ".round($issuer->getPacketLoss() * 100, 2)."%, ".round($issuer->getBandwidth() / 1024, 2)." KB/s\n";
                 break;
             case "gamemode":
+              if(!($issuer instanceof Player)){
+                $output .= "Only Console may be change gamemode.\n";
+                break;
+              }
                 $player = false;
                 $setgm = false;
                 $gms = array(
