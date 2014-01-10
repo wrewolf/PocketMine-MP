@@ -1,7 +1,7 @@
 #!/bin/bash
 COMPILER_VERSION="0.14"
 
-PHP_VERSION="5.5.6"
+PHP_VERSION="5.5.7"
 ZEND_VM="GOTO"
 
 LIBEDIT_VERSION="0.3"
@@ -280,5 +280,5 @@ mv php5/bin/php bin/php
 rm -r -f php5/ >> "$DIR/install.log" 2>&1
 date >> "$DIR/install.log" 2>&1
 echo " done!"
-echo "[PocketMine] You should start the server now using \"./start.sh\""
-echo "[PocketMine] If it doesn't works, please send the \"install.log\" file to the Bug Tracker"
+echo "[PocketMine] You should start the server now using \"./start.sh\.""
+echo "[PocketMine] If it doesn't work, please send the \"install.log\" file to the Bug Tracker."

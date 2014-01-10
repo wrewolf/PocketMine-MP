@@ -193,8 +193,10 @@ class CustomPacketHandler{
 			case MC_SET_TIME:
 				if($this->c === false){
 					$this->data["time"] = Utils::readInt($this->get(4));
+					$this->data["started"] = ord($this->get(1)) & 0x80 > 0;
 				}else{
-					$this->raw .= Utils::writeInt($this->data["time"]);
+					$this->raw .= Utils::writeInt($this->data["time"])."\x80";
+					$this->raw .= chr((isset($this->data["started"]) and $this->data["started"] == true) ? 0x80:0x00);
 				}
 				break;
 			case MC_START_GAME:
@@ -388,17 +390,17 @@ class CustomPacketHandler{
 					$this->data["x"] = Utils::readFloat($this->get(4));
 					$this->data["y"] = Utils::readFloat($this->get(4));
 					$this->data["z"] = Utils::readFloat($this->get(4));
-					$this->data["bodyYaw"] = Utils::readFloat($this->get(4));
-					$this->data["pitch"] = Utils::readFloat($this->get(4));
 					$this->data["yaw"] = Utils::readFloat($this->get(4));
+					$this->data["pitch"] = Utils::readFloat($this->get(4));
+					$this->data["bodyYaw"] = Utils::readFloat($this->get(4));
 				}else{
 					$this->raw .= Utils::writeInt($this->data["eid"]);
 					$this->raw .= Utils::writeFloat($this->data["x"]);
 					$this->raw .= Utils::writeFloat($this->data["y"]);
 					$this->raw .= Utils::writeFloat($this->data["z"]);
-					$this->raw .= Utils::writeFloat($this->data["bodyYaw"]);
-					$this->raw .= Utils::writeFloat($this->data["pitch"]);
 					$this->raw .= Utils::writeFloat($this->data["yaw"]);
+					$this->raw .= Utils::writeFloat($this->data["pitch"]);
+					$this->raw .= Utils::writeFloat($this->data["bodyYaw"]);
 				}
 				break;
 			case MC_PLACE_BLOCK:

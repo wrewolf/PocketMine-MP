@@ -22,8 +22,10 @@
 class PluginAPI extends stdClass{
 	private $server;
 	private $plugins = array();
+	private $randomNonce;
 	public function __construct(){
 		$this->server = ServerAPI::request();
+		$this->randomNonce = Utils::getRandomBytes(16, false);
 	}
 
 	public function getList(){
@@ -33,17 +35,16 @@ class PluginAPI extends stdClass{
 		}
 		return $list;
 	}
-
-	public function getInfo($className){
-		$className = strtolower($className);
-		if(!isset($this->plugins[$className])){
-			return false;
-		}
-		$plugin = $this->plugins[$className];
-		return array($plugin[1], get_class_methods($plugin[0]));
+	
+	public function getAll(){
+		return $this->plugins;
 	}
 
 	public function load($file){
+		if(is_link($file) or is_dir($file) or !file_exists($file)){
+			console("[ERROR] ".basename($file)." is not a file");
+			return false;
+		}
 		if(strtolower(substr($file, -3)) === "pmf"){
 			$pmf = new PMFPlugin($file);
 			$info = $pmf->getPluginInfo();
@@ -84,7 +85,7 @@ class PluginAPI extends stdClass{
 			console("[ERROR] Failed loading plugin: class already exists");
 			return false;
 		}
-		if(eval($info["code"]) === false or ($info["class"] !== "none" and !class_exists($info["class"]))){
+		if(((!isset($pmf) and (include $file) === false) or (isset($pmf) and eval($info["code"]) === false)) and $info["class"] !== "none" and !class_exists($info["class"])){
 			console("[ERROR] Failed loading {$info['name']}: evaluation error");
 			return false;
 		}
@@ -94,6 +95,8 @@ class PluginAPI extends stdClass{
 		if(!in_array((string) CURRENT_API_VERSION, $apiversion)){
 			console("[WARNING] Plugin \"".$info["name"]."\" may not be compatible with the API (".$info["apiversion"]." != ".CURRENT_API_VERSION.")! It can crash or corrupt the server!");
 		}
+		
+		$identifier = $this->getIdentifier($info["name"], $info["author"]);
 		
 		if($info["class"] !== "none"){			
 			$object = new $className($this->server->api, false);
@@ -105,18 +108,29 @@ class PluginAPI extends stdClass{
 				$object = null;
 				unset($object);
 			}else{
-				$this->plugins[$className] = array($object, $info);
+				$this->plugins[$identifier] = array($object, $info);
 			}
 		}else{
-			$this->plugins[md5($info["name"])] = array(new DummyPlugin($this->server->api, false), $info);
+			$this->plugins[$identifier] = array(new DummyPlugin($this->server->api, false), $info);
 		}
+		return true;
 	}
 
-	public function get(Plugin $plugin){
-		foreach($this->plugins as &$p){
-			if($p[0] === $plugin){
-				return $p;
+	public function getIdentifier($name, $author){
+		return sha1(trim(strtolower($name)), true) ^ sha1(trim(strtolower($author)), true) ^ sha1($this->randomNonce, true);
+	}
+
+	public function get($identifier){
+		if($identifier instanceof Plugin){
+			foreach($this->plugins as $p){
+				if($p[0] === $identifier){
+					return $p;
+				}
 			}
+			return false;
+		}
+		if(isset($this->plugins[$identifier])){
+			return $this->plugins[$identifier];
 		}
 		return false;
 	}
@@ -130,11 +144,12 @@ class PluginAPI extends stdClass{
 	
 	public function configPath(Plugin $plugin){
 		$p = $this->get($plugin);
+		$identifier = $this->getIdentifier($p[1]["name"], $p[1]["author"]);
 		if($p === false){
 			return false;
 		}
 		$path = $this->pluginsPath() . $p[1]["name"] . DIRECTORY_SEPARATOR;
-		$this->plugins[$p[1]["class"]][1]["path"] = $path;
+		$this->plugins[$identifier][1]["path"] = $path;
 		@mkdir($path);
 		return $path;
 	}
@@ -176,7 +191,7 @@ class PluginAPI extends stdClass{
 		$this->loadAll();
 	}
 
-	public function loadAll(){
+	private function loadAll(){
 		$dir = dir($this->pluginsPath());
 		while(false !== ($file = $dir->read())){
 			if($file{0} !== "."){

@@ -229,8 +229,7 @@ class Entity extends Position{
 	}
 	
 	private function spawnDrops(){
-    $drops=$this->getDrops();
-		foreach($drops as $drop){
+		foreach($this->getDrops() as $drop){
 			$this->server->api->entity->drop($this, BlockAPI::getItem($drop[0] & 0xFFFF, $drop[1] & 0xFFFF, $drop[2] & 0xFF), true);
 		}
 	}
@@ -239,9 +238,8 @@ class Entity extends Position{
 		$hasUpdate = false;
 		$time = microtime(true);
 		if($this->class === ENTITY_PLAYER and ($this->player instanceof Player) and $this->player->spawned === true and $this->player->blocked !== true){
-      $items=$this->server->api->entity->getRadius($this, 1.5, ENTITY_ITEM);
-			foreach($items as $item){
-				if(($time - $item->spawntime) >= 0.6){
+			foreach($this->server->api->entity->getRadius($this, 1.5, ENTITY_ITEM) as $item){
+				if($item->spawntime > 0 and ($time - $item->spawntime) >= 0.6){
 					if((($this->player->gamemode & 0x01) === 1 or $this->player->hasSpace($item->type, $item->meta, $item->stack) === true) and $this->server->api->dhandle("player.pickup", array(
 						"eid" => $this->player->eid,
 						"player" => $this->player,
@@ -251,6 +249,8 @@ class Entity extends Position{
 						"target" => $item->eid
 					)) !== false){
 						$item->close();
+						//$item->spawntime = 0;
+						//$this->server->schedule(15, array($item, "close"));
 					}
 				}
 			}
@@ -566,15 +566,25 @@ class Entity extends Position{
 					$players = $this->server->api->player->getAll($this->level);
 					if($this->player instanceof Player){
 						unset($players[$this->player->CID]);
+						$this->server->api->player->broadcastPacket($players, MC_MOVE_PLAYER, array(
+							"eid" => $this->eid,
+							"x" => $this->x,
+							"y" => $this->y,
+							"z" => $this->z,
+							"yaw" => $this->yaw,
+							"pitch" => $this->pitch,
+							"bodyYaw" => $this->yaw,
+						));
+					}else{
+						$this->server->api->player->broadcastPacket($players, MC_MOVE_ENTITY_POSROT, array(
+							"eid" => $this->eid,
+							"x" => $this->x,
+							"y" => $this->y,
+							"z" => $this->z,
+							"yaw" => $this->yaw,
+							"pitch" => $this->pitch,
+						));
 					}
-					$this->server->api->player->broadcastPacket($players, MC_MOVE_ENTITY_POSROT, array(
-						"eid" => $this->eid,
-						"x" => $this->x,
-						"y" => $this->y,
-						"z" => $this->z,
-						"yaw" => $this->yaw,
-						"pitch" => $this->pitch,
-					));
 				}
 			}else{
 				$this->updatePosition($this->x, $this->y, $this->z, $this->yaw, $this->pitch);
@@ -958,7 +968,7 @@ class Entity extends Position{
 		}elseif($health === $this->health){
 			return false;
 		}
-		if($this->server->api->dhandle("entity.health.change", array("entity" => $this, "eid" => $this->eid, "health" => $health, "cause" => $cause)) !== false){
+		if($this->server->api->dhandle("entity.health.change", array("entity" => $this, "eid" => $this->eid, "health" => $health, "cause" => $cause)) !== false or $force === true){
 			$this->health = min(127, max(-127, $health));
 			$this->server->query("UPDATE entities SET health = ".$this->health." WHERE EID = ".$this->eid.";");
 			if($harm === true){

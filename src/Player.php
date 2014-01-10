@@ -60,10 +60,6 @@ class Player{
 	public $blocked = true;
 	public $achievements = array();
 	public $chunksLoaded = array();
-    /** @var mixed Permissions Object */
-	public $permissions = false;
-    /** @var callable */
-    public $emitEvent = false;
 	private $chunksOrder = array();
 	private $lastMeasure = 0;
 	private $bandwidthRaw = 0;
@@ -1229,10 +1225,10 @@ class Player{
 			case MC_PONG:
 				break;
 			case MC_PING:
-				$t = (int) (microtime(true) * 1000);
+				$t = abs(microtime(true) * 1000);
 				$this->dataPacket(MC_PONG, array(
 					"ptime" => $data["time"],
-					"time" => (int) (microtime(true) * 1000),
+					"time" => $t,
 				));
 				$this->sendBuffer();
 				break;
@@ -1488,7 +1484,7 @@ class Player{
 				$data["eid"] = $this->eid;
 				$data["player"] = $this;
 				
-				if($data["slot"] === 0){
+				if($data["slot"] === 0x28 or $data["slot"] === 0){ //0 for 0.8.0 compatibility
 					$data["slot"] = -1;
 					$data["item"] = BlockAPI::getItem(AIR, 0, 0);
 					if($this->server->handle("player.equipment.change", $data) !== false){
@@ -1922,8 +1918,13 @@ class Player{
 					if($message{0} === "/"){ //Command
 						$this->server->api->console->run(substr($message, 1), $this);
 					}else{
-						if($this->server->api->dhandle("player.chat", array("player" => $this, "message" => $message)) !== false){
-							$this->server->api->chat->send($this, $message);
+						$data = array("player" => $this, "message" => $message);
+						if($this->server->api->handle("player.chat", $data) !== false){
+							if(isset($data["message"])){
+								$this->server->api->chat->send($this, $data["message"]);
+							}else{
+								$this->server->api->chat->send($this, $message);
+							}
 						}
 					}
 				}

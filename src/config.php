@@ -44,7 +44,7 @@ if($daylight === 0){
 date_default_timezone_set(timezone_name_from_abbr("", $offset, $daylight));
 
 gc_enable();
-error_reporting(E_ALL ^ E_NOTICE);
+error_reporting(E_ALL | E_STRICT);
 ini_set("allow_url_fopen", 1);
 ini_set("display_errors", 1);
 ini_set("display_startup_errors", 1);
@@ -60,12 +60,12 @@ ini_set("memory_limit", "128M"); //Default
 define("LOG", true);
 define("START_TIME", microtime(true));
 define("MAJOR_VERSION", "Alpha_1.3.11dev");
-define("CURRENT_MINECRAFT_VERSION", "v0.8.0 alpha build 5");
+define("CURRENT_MINECRAFT_VERSION", "v0.8.1 alpha");
 define("CURRENT_API_VERSION", 11);
 define("CURRENT_PHP_VERSION", "5.5");
 $gitsha1 = false;
 if(file_exists(FILE_PATH.".git/refs/heads/master")){ //Found Git information!
-	define(GIT_COMMIT, strtolower(trim(file_get_contents(FILE_PATH.".git/refs/heads/master"))));
+	define("GIT_COMMIT", strtolower(trim(file_get_contents(FILE_PATH.".git/refs/heads/master"))));
 }else{ //Unknown :(
-	define(GIT_COMMIT, str_repeat("00", 20));
+	define("GIT_COMMIT", str_repeat("00", 20));
 }

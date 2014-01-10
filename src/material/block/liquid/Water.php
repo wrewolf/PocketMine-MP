@@ -120,6 +120,7 @@ class WaterBlock extends LiquidBlock{
 					$tlevel = $sb->meta & 0x07;
 					if($tlevel != 0x00){
 						$this->level->setBlock($sb, new AirBlock(), false, false, true);
+            ServerAPI::request()->api->block->scheduleBlockUpdate(new Position($sb, 0, 0, $this->level), 10, BLOCK_UPDATE_NORMAL);
 					}
 				}
 				$b = $this->getSide(0)->getSide($side);
@@ -127,6 +128,7 @@ class WaterBlock extends LiquidBlock{
 					$tlevel = $b->meta & 0x07;
 					if($tlevel != 0x00){
 						$this->level->setBlock($b, new AirBlock(), false, false, true);
+            ServerAPI::request()->api->block->scheduleBlockUpdate(new Position($sb, 0, 0, $this->level), 10, BLOCK_UPDATE_NORMAL);
 					}
 				}
 				//ServerAPI::request()->api->block->scheduleBlockUpdate(new Position($b, 0, 0, $this->level), 10, BLOCK_UPDATE_NORMAL);
